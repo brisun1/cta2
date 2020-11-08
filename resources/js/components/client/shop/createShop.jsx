@@ -3,40 +3,38 @@ import ReactDOM from "react-dom";
 import axios from "axios";
 //import { useFormik } from "formik";
 
-class EditShop extends Component {
+export default class CreateShop extends Component {
     constructor(props) {
         super(props);
-        //const { shop } = this.props;
         this.state = {
-            //ownerName: this.props.ownerName,
-            //cterMobl: this.props.cterMobl,
-            inputs: this.props.shop,
-            //{
-            // shopName: shop.name,
-            // addr: shop.addr,
-            // area: shop.area,
-            // phone: shop.phone,
-            // ownerName: shop.owner_name,
-            // ownerMobl: shop.owner_mobl,
-            // cterMobl: shop.cter_mobl,
-            // orderMobl: shop.order_mobl,
+            inputs: {
+                shopName: "",
+                addr: "",
+                area: "",
+                phone: "",
+                ownerName: "",
+                ownerMobl: "",
+                cterMobl: "",
+                orderMobl: "",
 
-            // weekOpen: shop.weekOpen,
-            // weekClose: shop.weekClose,
-            // friOpen: shop.friOpen,
-            // friClose: shop.friClose,
-            // satOpen: shop.satOpen,
-            // satClose: shop.satClose,
-            // sunOpen: shop.sunOpen,
-            // sunClose: shop.sunClose,
-            // promTxt1: shop.promTxt1,
-            // promTxt2: shop.promTxt2,
-            // promTxt3: shop.promTxt3
-            // },
+                weekOpen: "",
+                weekClose: "",
+                friOpen: "",
+                friClose: "",
+                friOpen: "",
+                satClose: "",
+                satOpen: "",
+                satClose: "",
+                sunOpen: "",
+                sunClose: "",
+                promTxt1: "",
+                promTxt2: "",
+                promTxt3: ""
+            },
             selectedFile: null,
             promPic: null,
             promPic2: null,
-            promPic2: null,
+            promPic3: null,
             errors: {
                 shopName: "",
                 addr: "",
@@ -54,8 +52,6 @@ class EditShop extends Component {
                 weekClose: "",
                 friOpen: "",
                 friClose: "",
-                friOpen: "",
-                satClose: "",
                 satOpen: "",
                 satClose: "",
                 sunOpen: "",
@@ -222,11 +218,11 @@ class EditShop extends Component {
         // for (let [key, value] of Object.entries(this.state.ninput)) {
         //     data.set("${key}", "${value}");
         // }
-
         const o = Object.keys(this.state.inputs);
         for (let i = 0; i <= o.length - 1; i++) {
             data.set(o[i], this.state.inputs[o[i]]);
         }
+
         // const config = {
         //     headers: {
         //         "content-type": "application/x-www-form-urlencoded"
@@ -235,16 +231,12 @@ class EditShop extends Component {
         console.log("dddd" + JSON.stringify(data));
 
         axios
-            .post("api/shop/update", data, {
-                params: {
-                    _method: "PUT"
-                }
-            })
+            .post("api/shop/store", data, {})
 
             .then(res => {
                 // then print response status
-
-                //console.log("res" + JSON.stringify(res));
+                console.log("datadata" + data);
+                console.log(res);
                 if (res.data == "shop success")
                     window.location.replace("/dashBoard");
             });
@@ -256,7 +248,7 @@ class EditShop extends Component {
             <div>
                 <br />
                 <br />
-                <h5 className="text-center">Edit Shop</h5>
+                <h5 className="text-center">Shop Registration Form</h5>
                 <hr />
                 <form onSubmit={this.handleSubmit} className="form-horizontal">
                     <div className="form-group">
@@ -536,14 +528,9 @@ class EditShop extends Component {
                             <p className="text-danger">{errors.promTxt3}</p>
                         )}
                     </div>
-                    <label>Edit Photos :</label>
-                    <br />
+                    <label>Photos upload:</label>
                     <label className="control-label">
                         Shop facia photo:
-                        <img
-                            src={`/storage/shop_img/${this.props.shop.img}`}
-                            style={{ height: "100px", width: "200px" }}
-                        />
                         <input
                             type="file"
                             name="image"
@@ -554,10 +541,6 @@ class EditShop extends Component {
 
                     <label className="control-label">
                         Promotion and offers photo 1:
-                        <img
-                            src={`/storage/shop_img/${this.props.shop.img1}`}
-                            style={{ height: "70px", width: "105px" }}
-                        />
                         <input
                             type="file"
                             name="promPic"
@@ -568,10 +551,6 @@ class EditShop extends Component {
 
                     <label className="control-label">
                         Promotion and offers photo 2:
-                        <img
-                            src={`/storage/shop_img/${this.props.shop.img2}`}
-                            style={{ height: "70px", width: "105px" }}
-                        />
                         <input
                             type="file"
                             name="promPic2"
@@ -581,10 +560,6 @@ class EditShop extends Component {
                     <br />
                     <label className="control-label">
                         Promotion and offers photo 3:
-                        <img
-                            src={`/storage/shop_img/${this.props.shop.img3}`}
-                            style={{ height: "70px", width: "105px" }}
-                        />
                         <input
                             type="file"
                             name="promPic3"
@@ -595,11 +570,10 @@ class EditShop extends Component {
                     <input
                         type="submit"
                         className="btn btn-info"
-                        value="Update"
+                        value="Submit"
                     />
                 </form>
             </div>
         );
     }
 }
-export default EditShop;

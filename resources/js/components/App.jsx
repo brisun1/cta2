@@ -3,6 +3,7 @@ import Shops from "./shop/shops";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import ReactDOM from "react-dom";
 import MenuOrder from "./menu/menuOrder";
+import Msg from "./client/shop/msg";
 class App extends Component {
     //const favourite = null;
     state = {
@@ -27,18 +28,20 @@ class App extends Component {
     }
     render() {
         return (
-            <Router>
-                <Link to="/">Home</Link>
-
-                <Switch>
-                    <Route exact path="/orderMenu/:id">
-                        <MenuOrder shops={this.state.shops} />
-                    </Route>
-                    <Route exact path="/">
-                        <Shops data={this.state} />
-                    </Route>
-                </Switch>
-            </Router>
+            <>
+                <Router>
+                    <Link to="/">Home</Link>
+                    <Msg />
+                    <Switch>
+                        <Route exact path="/orderMenu/:id">
+                            <MenuOrder shops={this.state.shops} />
+                        </Route>
+                        <Route exact path="/">
+                            <Shops data={this.state} />
+                        </Route>
+                    </Switch>
+                </Router>
+            </>
         );
     }
 }

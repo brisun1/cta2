@@ -273,8 +273,8 @@ class MenuOrder extends Component {
                 })
             );
     }
-    handleSubmitFoodForm = () => {
-        event.preventDefault();
+    handleSubmitFoodForm = e => {
+        e.preventDefault();
         const checkMenu = [];
         this.state.menu.forEach(el => {
             if (el.orderQty > 0) {
@@ -295,7 +295,7 @@ class MenuOrder extends Component {
                     this.setState({
                         custData: { ...this.state.custData, foodSubmited: true }
                     });
-                    this.handleNextStep();
+                    //this.handleNextStep();
                     //this.props.handleNextStep();
                 }
             });
@@ -559,6 +559,7 @@ class MenuOrder extends Component {
                         </div>
                     ) : (
                         <CashOrderConfirm
+                            handleNextStep={this.handleNextStep}
                             handlePrevStep={this.handlePrevStep}
                             handleSubmitFoodForm={this.handleSubmitFoodForm}
                             custData={custData}

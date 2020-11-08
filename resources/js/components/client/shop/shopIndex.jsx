@@ -7,6 +7,7 @@ import {
     Link,
     NavLink,
     Redirect
+    //useRouteMatch
 } from "react-router-dom";
 import ReactDOM from "react-dom";
 //import ClientApp from "./clientApp";
@@ -15,24 +16,45 @@ import MenuForm from "../menu/menuForm";
 import ClientMenu from "../menu/clientMenu";
 import EditMenu from "../menu/editMenu";
 import ShopApp from "./shopApp";
-import CreateShop from "./client/createShop";
+import CreateShop from "./createShop";
 
 import DeliForm from "../delivery/deliveryForm";
-import DeliShow from "../menu/deliShow";
+import DeliShow from "../delivery/deliShow";
+import DeliUpdate from "../delivery/deliUpdate";
 import ShopDetail from "./shopDetail";
-import EditShop from "./client/editShop";
-
+import EditShop from "./editShop";
+import BankForm from "../bank/bankForm";
+import BankShow from "../bank/bankShow";
+import BankUpdate from "../bank/bankUpdate";
+//import { Router } from "react-router";
+//import { createBrowserHistory } from "history";
+import Msg from "./msg";
+//const history = createBrowserHistory();
+//import Echo from "laravel-echo";
+import history from "../../history";
 class ShopIndex extends Component {
-    state = {
-        schedule: { name: null, tblString: null },
-        shop: [],
-        links: []
-    };
+    constructor(props) {
+        super(props);
+        this.state = {
+            schedule: { name: null, tblString: null },
+            shop: [],
+            links: [],
+            userId: null,
+            orderMsg: ""
+        };
+        /////////
+        // const [customer, setCustomer] = useState([]);
+        // const [food, setFood] = useState([]);
+        //const [clientRes, setClientRes] = useState({});
+    }
+    //////////
     componentDidMount() {
         //this._isMounted = true;
-        //console.log("from clientShop ui DidM");
+        // console.log(
+        //     "from Shopindex ui DidM" + JSON.stringify(history.location)
+        // );
         axios.get("api/shop/show").then(res => {
-            console.log("from ui DidM" + JSON.stringify(res));
+            //console.log("from ui DidM" + JSON.stringify(res));
             const schedule = { ...this.state.schedule };
             const links = [...this.state.links];
 
@@ -44,6 +66,10 @@ class ShopIndex extends Component {
                     //schedule: "createShop",
                     shop: res.data.data
                 });
+                ///////
+                //console.log("in shopindex" + JSON.stringify(res.data));
+                this.setState({ userId: res.data.meta.user_id });
+                //////////
                 if (res.data.meta.noMenu) {
                     schedule.name = "createMenu";
                     schedule.tblString = res.data.meta.noMenu;
@@ -76,10 +102,26 @@ class ShopIndex extends Component {
                 this.setState({ links });
             }
         });
+        // let echo = new Echo({
+        //     broadcaster: "socket.io",
+
+        //     host: window.location.hostname + ":6001"
+        // });
+
+        // echo.private("order." + this.state.user_id).notification(
+        //     notification => {
+        //         console.log("note" + JSON.stringify(notification));
+        //         if (notification.orderMsg)
+        //             this.setState({ orderMsg: notification.orderMsg });
+        //     }
+        // );
     }
     componentWillUnmount() {
-        this._isMounted = false;
+        // this._isMounted = false;
     }
+    goBack = () => {
+        history.go(-1);
+    };
     getLinks = () => {
         const linksToShow = [];
         const createShop = (
@@ -150,21 +192,35 @@ class ShopIndex extends Component {
             const shop = this.state.shop[0];
             tblString = shop.shopName + shop.area + shop.id;
         }
+        // if (this.props.orderMsg.length > 0) {
+        //     let r = confirm("You have a new order. Go to order page?");
+        //     if (r == true) {
+        //         //clear note
+        //         //this.props.clearNote();
+        //         return <Redirect to="/dashBoard" />;
+        //     }
+        // }
+        //let { path, url } = useRouteMatch();
         return (
             <div>
                 <Router>
                     <nav className="d-flex justify-content-around bg-light">
                         <NavLink
-                            to="/shopDefault"
+                            to="/clientShops"
                             activeClassName="bg-warning pl-3 pr-3"
                         >
                             Default Page
                         </NavLink>
                         {this.getLinks()}
                     </nav>
+                    <div>
+                        <Msg />
+                    </div>
                     <Switch>
                         <Route exact path="/clientShops">
-                            <Redirect to="shopDefault" />
+                            {/* <Route exact path="/clientShops"> */}
+                            <ShopApp data={this.state} />
+                            {/* <Redirect to="shopDefault" /> */}
                         </Route>
                         <Route exact path="/shopDefault">
                             <ShopApp data={this.state} />
@@ -199,10 +255,30 @@ class ShopIndex extends Component {
                             <DeliForm shop={this.state.shop[0]} />
                         </Route>
                         <Route exact path="/deliShow">
-                            <DeliShow shop={this.state.shop} />
+                            <DeliShow shop={this.state.shop[0]} />
+                        </Route>
+                        <Route exact path="/deliUpdate">
+                            <DeliUpdate shop={this.state.shop[0]} />
+                        </Route>
+                        <Route exact path="/createBank">
+                            <BankForm />
+                        </Route>
+                        <Route exact path="/bankShow">
+                            <BankShow />
+                        </Route>
+                        <Route exact path="/bankUpdate">
+                            <BankUpdate />
                         </Route>
                     </Switch>
                 </Router>
+                {console.log(
+                    "IN SHOPiNDEX" + JSON.stringify(history.location.pathname)
+                )}
+                {history.location.pathname === "/clientShops" && (
+                    <button className="btn btn-secondary" onClick={this.goBack}>
+                        {"< "}Go Back
+                    </button>
+                )}
             </div>
         );
     }

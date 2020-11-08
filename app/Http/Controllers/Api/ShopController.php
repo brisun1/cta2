@@ -225,6 +225,7 @@ class ShopController extends Controller
         return  ShopResource::collection($shops)->additional(['meta' => [
             'noMenu' => $noMenu,
             'noDeli' => $noDeli,
+            'user_id'=>Auth::id(),
         ]]);
         }else return;
       
@@ -427,6 +428,118 @@ class ShopController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    public function minorUpdate(Request $request)
+    {
+       if($request->get('id')){
+        $id=$request->get('id');
+        $shop=Shop::find($id);
+        
+        if($shop){
+            if($request->get('orderMobl'))
+            
+            $shop->order_mobl=$request->get('orderMobl');
+    
+    // $shop->is_completed=false;
+    // $shop->week_open=$request->get('weekOpen');
+    // $shop->week_close=$request->get('weekClose');
+    // $shop->fri_open=$request->get('friOpen');
+    // $shop->fri_close=$request->get('friClose');
+    // $shop->sat_open=$request->get('satOpen');
+    // $shop->sat_close=$request->get('satClose');
+    // $shop->sun_open=$request->get('sunOpen');
+    // $shop->sun_close=$request->get('sunClose');
+            if($request->get('promTxt1')){
+                $shop->prom_txt1=$request->get('promTxt1');
+                $shop->prom_txt2=$request->get('promTxt2');
+                $shop->prom_txt3=$request->get('promTxt3');
+                }
+     // Handle File Upload
+     
+     if($request->get('offer')){
+        $shop->offer=$request->get('offer');
+       
+        }
+     
+            if($request->hasFile('promPic')){
+                            
+                $photo=$request->file('promPic');
+            
+                $filenameWithExt = $photo->getClientOriginalName();
+            
+                $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+            
+                $extension = $photo->getClientOriginalExtension();
+            
+                $fileNameToStore= $filename.'_'.time().'.'.$extension;
+                
+                Image::make($photo)->resize(null,200)->save(public_path('storage/shop_img/'.$fileNameToStore));                
+               
+                //$tbl_img='img'.$i;
+                $shop->img1=$fileNameToStore;     
+            }  
+            // else{
+                
+        
+            //     $shop->img1='no-user.jpg'; 
+            // }    
+            
+            if($request->hasFile('promPic2')){
+                        
+                $photo=$request->file('promPic2');
+                $filenameWithExt = $photo->getClientOriginalName();
+            
+                $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+            
+                $extension = $photo->getClientOriginalExtension();
+            
+                $fileNameToStore= $filename.'_'.time().'.'.$extension;
+                
+                Image::make($photo)->resize(null,200)->save(public_path('storage/shop_img/'.$fileNameToStore));                
+                $shop->img2=$fileNameToStore;     
+                
+            }
+    //else{
+            
+       
+    //     $shop->img2='no-user.jpg'; 
+    // } 
+            if($request->hasFile('promPic3')){
+                    
+                $photo=$request->file('promPic3');
+                $filenameWithExt = $photo->getClientOriginalName();
+            
+                $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+            
+                $extension = $photo->getClientOriginalExtension();
+            
+                $fileNameToStore= $filename.'_'.time().'.'.$extension;
+                
+                Image::make($photo)->resize(null,200)->save(public_path('storage/shop_img/'.$fileNameToStore));                
+                $shop->img3=$fileNameToStore;     
+                
+            }
+        // else{
+                
+        
+        //     $shop->img3='no-user.jpg'; 
+        // } 
+        
+            $shop->save();
+            
+            return "shop minorUpdate success";
+        }
+    
+    }
+}
+
+
+    public function getUser(){
+        if (Auth::check()){
+        if(Auth::user()->role==="client")
+        return ["id"=>Auth::id()];
+    }
+        else return "no user";
+    }
     public function destroy($id)
     {
         //

@@ -34,6 +34,7 @@ class CreateShopsTable extends Migration
             $table->text('prom_txt2')->nullable();
             $table->string('img3')->nullable();
             $table->text('prom_txt3')->nullable();
+            $table->integer('offer',2)->nullable();
             $table->time('week_open',2);
             $table->time('week_close',2);
             $table->time('fri_open',2);

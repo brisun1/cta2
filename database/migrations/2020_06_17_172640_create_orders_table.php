@@ -34,7 +34,7 @@ class CreateOrdersTable extends Migration
             //$table->string('orderRef');
             $table->string('orderFoodTbl');
             $table->boolean('isComplete')->nullable();
-            $table->boolean('cilentRes')->nullable();
+            $table->boolean('clientRes')->nullable();
             $table->string('order_pwd')->nullable();
             //$table->dateTime('created_at', 0);
             $table->dateTime('pwd_created')->nullable();

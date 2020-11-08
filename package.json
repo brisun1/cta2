@@ -31,7 +31,9 @@
         "@stripe/react-stripe-js": "^1.1.2",
         "@stripe/stripe-js": "^1.7.0",
         "focus-trap-react": "^7.0.1",
+        "laravel-echo": "^1.8.1",
         "react-router-dom": "^5.2.0",
+        "redis-server": "^1.2.2",
         "socket.io-client": "^2.3.0"
     }
 }

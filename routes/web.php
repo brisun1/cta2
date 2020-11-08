@@ -22,6 +22,13 @@ Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
 Route::get('/dashBoard', 'DashBoardController@index')->name('dashBoard');
 Route::get('/help', 'HelpController@contact')->name('help');
 Route::post('/email', 'HelpController@email')->name('email');
+Route::get('/t', function () {
+    event(new \App\Events\SendMessage());
+    dd('Event Run Successfully.');
+});
+Route::get('/w', function () {
+    return view('welcome');
+});
 Route::get('/{path?}', [
     'uses' => 'ReactController@show',
     'as' => 'react',

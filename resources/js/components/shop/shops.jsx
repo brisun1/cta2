@@ -6,8 +6,8 @@ import Map from "../maps/map";
 import "../../../css/style.css";
 import FavorShop from "./favorShop";
 class Shops extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         //const favourite = null;
         this.state = {
             // chosen: null,

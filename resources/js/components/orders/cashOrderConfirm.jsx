@@ -12,6 +12,7 @@ class CashOrderConfirm extends Component {
     };
     handleSubmitPwd = e => {
         e.preventDefault(e);
+        //this.props.handleSubmitFoodForm(e);
         let data = { phonePwd: this.state.phonePwd };
         axios
             .post(
@@ -24,9 +25,9 @@ class CashOrderConfirm extends Component {
             .then(res => {
                 //console.log("pwddddddddd" + JSON.stringify(res));
                 if (res.data == "pwd matched") {
-                    this.props.handleSubmitFoodForm();
+                    //
                     // if (this.props.custData.foodSubmited == true) {
-                    //this.props.handleNextStep();
+                    this.props.handleNextStep();
                     // this.props.handleNextStep();
                     // }
                 }

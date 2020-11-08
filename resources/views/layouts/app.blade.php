@@ -23,6 +23,11 @@
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="../../style.css" />
+    {{-- <script>
+        window.onload = function() {
+          var context = new AudioContext();
+        }
+        </script> --}}
 </head>
 <body>
     <div id="app">

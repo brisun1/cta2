@@ -1,7 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Broadcast;
-
+use Illuminate\Support\Facades\Auth;
+use App\User;
+use App\Order;
+use App\Shop;
 /*
 |--------------------------------------------------------------------------
 | Broadcast Channels
@@ -13,6 +16,18 @@ use Illuminate\Support\Facades\Broadcast;
 |
 */
 
-Broadcast::channel('App.User.{id}', function ($user, $id) {
+// Broadcast::channel('App.User.{id}', function ($user, $id) {
+//     return (int) $user->id === (int) $id;
+// });
+$user=new User;
+
+
+Broadcast::channel('order.{id}', function (User $user, int $id) {
+    // $shops=$user->shops;
+    // foreach($shops as $shop){
+    // if($shop->id)$shop_id=$shop->id;
+    // }
+    //return $shop_id ===$order->$shop_id;
+    // logger('Basked ID:hjhhhhhhhhh ');
     return (int) $user->id === (int) $id;
 });

@@ -24,6 +24,27 @@
         </div>
     </div>
 </div>
-
+{{-- <audio autoplay>
+    <source src="storage/sound.mp3">
+</audio> --}}
+  
+  {{-- <p>Click the buttons to play or pause the audio.</p> --}}
+  {{-- <iframe src="storage/sound.mp3" allow="autoplay" style="display:none" id="iframeAudio">
+  </iframe> --}}
+  {{-- <button onclick="playAudio()" type="button">Play Audio</button>
+  <button onclick="pauseAudio()" type="button">Pause Audio</button> 
+  
+  <script>
+  var x = document.getElementById("myAudio"); 
+  
+  function playAudio() { 
+    x.play(); 
+  } 
+  
+  function pauseAudio() { 
+    x.pause(); 
+  } 
+  </script> --}}
+<script src="//{{ Request::getHost() }}:{{env('LARAVEL_ECHO_PORT')}}/socket.io/socket.io.js"></script>
 @endsection
 

@@ -23,7 +23,7 @@ class Shop extends Model
     // }
     public function orders()
     {
-        return $this->hasMany('App\Order');
+        return $this->hasMany('App\Order')->orderBy('created_at','DESC');
     }
     public function delivery()
     {

@@ -42,7 +42,8 @@ class Shop extends JsonResource
             'img2' => $this->img2,
             'promTxt2'=>$this->prom_txt2,
             'img3' => $this->img3,
-            'promTxt3'=>$this->prom_txt3
+            'promTxt3'=>$this->prom_txt3,
+            'offer'=>$this->offer
             
         ];
     }

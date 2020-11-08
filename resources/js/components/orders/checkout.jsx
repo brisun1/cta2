@@ -119,7 +119,7 @@ class Checkout extends Component {
         this.setState({ phonePwd: e.target.value });
     };
     handleSubmitPwd = e => {
-        e.preventDefault(e);
+        e.preventDefault();
         let data = { phonePwd: this.state.phonePwd };
         axios
             .post(
@@ -130,9 +130,9 @@ class Checkout extends Component {
                 }
             )
             .then(res => {
-                //console.log("pwddddddddd" + JSON.stringify(res));
+                console.log("pwddddddddd" + JSON.stringify(res));
                 if (res.data == "pwd matched") {
-                    this.props.handleSubmitFoodForm();
+                    this.props.handleSubmitFoodForm(e);
                     // if (this.props.custData.foodSubmited == true) {
                     // this.props.handleNextStep();
                     // this.props.handleNextStep();
@@ -169,6 +169,7 @@ class Checkout extends Component {
         this.setState({ cashConfirmed: true });
         //there is event
         this.closeModal(event);
+        this.props.handleSubmitFoodForm(event);
         this.props.handleNextStep();
     };
     // custUpdate = data => {

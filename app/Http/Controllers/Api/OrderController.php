@@ -16,6 +16,7 @@ use App\Order;
 use App\OrderMenu;
 use App\CreateTbl;
 use Carbon\Carbon;
+use App\Notifications\NewOrderNote;
 
 class OrderController extends Controller
 {
@@ -24,6 +25,7 @@ class OrderController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    
     public function index()
     {
         //
@@ -144,7 +146,7 @@ class OrderController extends Controller
      $order->orderFoodTbl=$tblName;
      
      $order->isComplete=0;
-     $order->cilentRes=0;
+     $order->clientRes=0;
      $order->save();
         $createTbl=new CreateTbl();
         $createTbl->create_orderFoodTbl($tblName);
@@ -158,38 +160,80 @@ class OrderController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    
     public function matchPwd(Request $request,$tbl_string)
     {
-        
+        $foods=new OrderMenu();
+        $tbl_name="order_".$tbl_string;
+        $foods->setTable($tbl_name);
+        if (Schema::hasTable($tbl_name))
+        $food=new OrderMenuCollection($foods->get());
       
         $tblName="order_".$tbl_string;
-        
+       
         $order= Order::where('orderFoodTbl',$tblName)->first();
-    
+        $shop_id=$order->shop_id;
+        $user_id=Shop::find($shop_id)->user->id;
+
         if($request->has("phonePwd")){
-            if($order->order_pwd===$request->phonePwd)
-            return "pwd matched";}
+            if($order->order_pwd===$request->phonePwd){
+          // { event(new \App\Events\SendMessage($order,$food));
+            $order->isComplete=true;
+            $order->save();
+            { event(new \App\Events\NewOrder($order,$food,$user_id));
+            //$this.update()
+            /////////////////////
+            //$orderMsg="u have new order";
+            $user=User::where("id",$user_id)->first();
+            $user->notify(new NewOrderNote($order->id));
+            ////////////////////
+                return "pwd matched";}
+        }else return "wrong password";
+    }
+    }
+    public function getFood($tbl_string){
+        
+        $orderFood=new OrderMenu();
+        $tbl_name="order_".$tbl_string;
+        $orderFood->setTable($tbl_name);
+         //return new OrderMenuCollection($orderFood->get());
+        return $orderFood->get();
     }
     public function show()
     {
-
-        //$shops=User::find(Auth::id())->shops;   
-        $shops=User::find(15)->shops;
+        if (Auth::check())
+        {
+            $shops=User::find(Auth::id())->shops;
+        }
+          
+        $date = Carbon::now()->subWeeks(3);
         
+        if(isset($shops)){
         foreach($shops as $shop){
-            $data= Shop::find($shop->id)->orders;
+            $data= Shop::find($shop->id)->orders->where('isComplete',1);
             
                
             $i=0;
             foreach ($data as $order) {
                 if(!empty($order)){
+                    
+                    if($date<$order->updated_at){
                 $orders[$i]=$order;
-                }
-            $i++;
+                $i++;
             }
-        }
+                
+                }
+               
+            }
+        }}
+         //$orders['user_id']=Auth::id();
+         //$orders['user']=15;
         if(isSet($orders)){
-        return new OrderCollection($orders);}
+        return (new OrderCollection($orders))
+        // ->additional(...)
+        //this data is attached in resource file
+        
+        ;}
         else return ;
 //return response()->json($orders);
     }
@@ -202,6 +246,7 @@ class OrderController extends Controller
      */
     public function custShow($tbl_string)
     {
+        
         $food=new OrderMenu();
         $tbl_name="order_".$tbl_string;
         $food->setTable($tbl_name);
@@ -211,7 +256,10 @@ class OrderController extends Controller
        
 
         $tblName="order_".$tbl_string;
-           
+        // $current = Carbon::now();
+        // $date =$current->subWeeks(3);
+        
+        //$order= Order::where('orderFoodTbl',$tblName)->where('updated_at','>',$date)->get();
         $order= Order::where('orderFoodTbl',$tblName)->get();
             
         $data['order']=new OrderCollection($order);
@@ -263,6 +311,9 @@ class OrderController extends Controller
     if($request->has("paidAmt")){
         $order->paidAmt=$request->paidAmt;
     }
+    if($request->has("isComplete")){
+        $order->isComplete=$request->isComplete;
+    }
     //  $order->email="";
     //  $order->cardPay=$request->cardPay;
      
@@ -277,7 +328,9 @@ class OrderController extends Controller
      $order->save();
         // $createTbl=new CreateTbl();
         // $createTbl->create_orderFoodTbl($tblName);
-            
+        if($request->isComplete===true){
+            event(new \App\Events\SendMessage($order->get()));
+        }
         return "order update success";
     }
 
@@ -287,6 +340,17 @@ class OrderController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    public function clientUpdate(Request $request, $tblName)
+    {
+        $order= Order::where('orderFoodTbl',$tblName)->first();
+    
+    if($request->has("clientRes")){
+
+        $order->clientRes=$request->clientRes;
+    }
+    
+        $order->save();
+       return "clientRes success";}
     public function destroy($id)
     {
         //

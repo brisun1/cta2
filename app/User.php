@@ -6,7 +6,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
-
+use App\Notifications\NewOrderNote;
 class User extends Authenticatable
 {
     use HasApiTokens, Notifiable;
@@ -36,8 +36,16 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+    public function receivesBroadcastNotificationsOn()
+    {
+        return 'order.'.$this->id;
+    }
     public function shops()
     {
         return $this->hasMany('App\Shop','user_id');
+    }
+    public function bank()
+    {
+        return $this->hasOne('App\Bank');
     }
 }

@@ -13,28 +13,35 @@ require("./bootstrap");
  */
 require("./components/App");
 require("./components/Example");
-require("./components/clientApp");
-//shops
-require("./components/shop/shopDetail");
-// require("./components/shop/createShop");
+require("./components/clientIndex");
+// require("./components/client/clientApp");
+// //shops
+// require("./components/client/shop/shopDetail");
 
-require("./components/shop/facia");
-require("./components/shop/client/createShop");
-require("./components/shop/client/editShop");
-require("./components/shop/favorShop");
-//require("./components/shop/shops");
-//menu
-require("./components/menu/menuForm");
-require("./components/menu/menuShow");
-require("./components/menu/clientMenu");
-require("./components/menu/deliShow");
-//require("./components/menu/callTest");
-//delivery
+// require("./components/shop/facia");
+// require("./components/shop/client/createShop");
+// require("./components/shop/client/editShop");
+// require("./components/shop/favorShop");
 
-require("./components/delivery/deliShow");
+// //menu
+// require("./components/menu/menuForm");
+// require("./components/menu/menuShow");
+// require("./components/menu/clientMenu");
+// require("./components/menu/deliShow");
+
+// //delivery
+
+// require("./components/delivery/deliShow");
 //maps
 require("./components/maps/map");
 require("./components/maps/getDist");
+//require("./components/socket");
 //require("./components/routeTest");
 //general
-require("./components/clientIndex");
+// require("./components/clientIndex");
+// import Echo from "laravel-echo";
+
+// window.Echo = new Echo({
+//     broadcaster: "socket.io",
+//     host: window.location.hostname + ":" + window.laravel_echo_port
+// });
