@@ -50,13 +50,13 @@ class ClientMenu extends Component {
     componentDidMount() {
         // const { shop } = this.props;
         // let str_tbl = shop.name + shop.area + shop.id;
-        console.log("params string" + this.props.tblString);
+        //console.log("params string" + this.props.tblString);
         //dilivery price should be passed in controller
-        axios.get(`api/menu/show/${this.props.tblString}`).then(res => {
+        axios.get("api/menu/show/" + this.props.tblString).then(res => {
             let sData = res.data;
-            console.log(
-                "whyres in clientmenu didmount" + JSON.stringify(sData.data)
-            );
+            // console.log(
+            //     "whyres in clientmenu didmount" + JSON.stringify(sData.data)
+            // );
 
             if (sData.data) {
                 let menu = sData.data;

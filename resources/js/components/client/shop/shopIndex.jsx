@@ -27,7 +27,7 @@ import BankForm from "../bank/bankForm";
 import BankShow from "../bank/bankShow";
 import BankUpdate from "../bank/bankUpdate";
 //import { Router } from "react-router";
-//import { createBrowserHistory } from "history";
+//import { history } from "history";
 import Msg from "./msg";
 //const history = createBrowserHistory();
 //import Echo from "laravel-echo";
@@ -62,6 +62,9 @@ class ShopIndex extends Component {
                 const shop = res.data.data;
                 shop.forEach;
                 links.push("shopShow");
+                // console.log(
+                //     "in shopindex didmount" + JSON.stringify(res.data.data)
+                // );
                 this.setState({
                     //schedule: "createShop",
                     shop: res.data.data
@@ -271,9 +274,11 @@ class ShopIndex extends Component {
                         </Route>
                     </Switch>
                 </Router>
-                {console.log(
+                {/* {console.log(
                     "IN SHOPiNDEX" + JSON.stringify(history.location.pathname)
-                )}
+                )} */}
+                <br />
+                <hr />
                 {history.location.pathname === "/clientShops" && (
                     <button className="btn btn-secondary" onClick={this.goBack}>
                         {"< "}Go Back

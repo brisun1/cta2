@@ -17,7 +17,7 @@ use App\OrderMenu;
 use App\CreateTbl;
 use Carbon\Carbon;
 use App\Notifications\NewOrderNote;
-
+use App\Notifications\ClientResNote;
 class OrderController extends Controller
 {
     /**
@@ -49,6 +49,14 @@ class OrderController extends Controller
      */
     public function storeFood(Request $request,$tbl_string)
     {//return "storeFood1 success".$request->input('0.fname');
+        $this->validate($request, [
+            '*.fid' => ['distinct','string','max:30','nullable','regex:/(^[A-Za-z0-9 ]+$)+/'],
+            '*.fname' => ['string','min:2','max:30','required','regex:/(^[A-Za-z0-9\s]+$)+/'],
+            '*.price' => 'required|numeric|between:0,200|regex:/^\d+(\.\d{1,2})?+$/',
+            '*.subTotal' => 'required|numeric|between:0,1000|regex:/^\d+(\.\d{1,2})?+$/',
+            '*.orderQty' => 'required|numeric|between:1,80|regex:/^\d+(\.\d{1,2})?+$/',
+            '*.mainAttach.*' => ['string','max:30','nullable','regex:/(^[A-Za-z0-9\s]+$)+/'],
+           ]);
         $data=$request->input();
         foreach($data as $food){
             if($food['fname']){
@@ -121,11 +129,30 @@ class OrderController extends Controller
     public function store(Request $request,$tbl_string)
     {
         
-        //validation goes here
+        $this->validate($request, [
+            'isDeli'=>'required|boolean',
+            'custPhone' => 'required|string|min:10|max:40',
+            'custAddr' => 'string|required_if:isDeli,true|min:5|max:60|nullable',
+            'orderMobile' => 'string|max:40|nullable',
+            'cardPay'=>'required|boolean',
+            'orderMsg'=>'string|max:120|nullable',
+            'deliPrice'=>'numeric|required_if:isDeli,true|between:0,30|nullable',
+            // 'orderMobile' => 'string|max:40',
+            //'frPrice'=>'numeric|between:0,10|
+            // 'cterMobl' => 'required|string|min:10|max:40',
+            
+            
+            ]);
     //    if($request->has('fname')){        
     //     $cat=$request->cat;
+    
+     $tblName="order_".$tbl_string;
+    //  $order->orderFoodTbl=$tblName;
+    $old= Order::where('orderFoodTbl', $tblName)->first();
+    if($old)$old->delete();
     $order=new Order();
     $s=explode('_',$tbl_string,2);
+
     $order->shop_id=$s[0];
     $deliPrice=$request->deliPrice;
      if($deliPrice=="max"){$deliPrice=5;}
@@ -163,6 +190,12 @@ class OrderController extends Controller
     
     public function matchPwd(Request $request,$tbl_string)
     {
+        
+        $this->validate($request, [
+           
+            'phonePwd' => 'required|string|min:5|max:5',
+            
+            ]);
         $foods=new OrderMenu();
         $tbl_name="order_".$tbl_string;
         $foods->setTable($tbl_name);
@@ -173,23 +206,79 @@ class OrderController extends Controller
        
         $order= Order::where('orderFoodTbl',$tblName)->first();
         $shop_id=$order->shop_id;
-        $user_id=Shop::find($shop_id)->user->id;
-
+        $orderId=$order->id;
+        $shop=Shop::find($shop_id);
+        $user_id=$shop->user->id;
+        if($shop->order_mobl){
+            $clientph=$shop->order_mobl;}else{
+                $clientph=$shop->cter_mobl;  
+            }
         if($request->has("phonePwd")){
             if($order->order_pwd===$request->phonePwd){
           // { event(new \App\Events\SendMessage($order,$food));
             $order->isComplete=true;
             $order->save();
             { event(new \App\Events\NewOrder($order,$food,$user_id));
-            //$this.update()
-            /////////////////////
-            //$orderMsg="u have new order";
+           
             $user=User::where("id",$user_id)->first();
             $user->notify(new NewOrderNote($order->id));
-            ////////////////////
+            
+            //$this->sendSMS($order->order_mobl);
+           
                 return "pwd matched";}
         }else return "wrong password";
     }
+    }
+    public function sendSMS($orderMobl){
+        // Account details
+	$apiKey = urlencode('HzkpF5ghup4-nbc0VzgoqdDWDLv1fIziHgmdu4trc7');
+	
+	// Message details
+	//$numbers = array($orderMobl, 447987654321);
+	$sender = urlencode('Eat Chinese.ie');
+	$message = rawurlencode('Your phone confirmation code is');
+ 
+	//$numbers = implode(',', $numbers);
+ 
+	// Prepare data for POST request
+	$data = array('apikey' => $apiKey, 'numbers' => $orderMobl, "sender" => $sender, "message" => $message);
+ 
+	// Send the POST request with cURL
+	$ch = curl_init('https://api.txtlocal.com/send/');
+	curl_setopt($ch, CURLOPT_POST, true);
+	curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	$response = curl_exec($ch);
+	curl_close($ch);
+	
+	// Process your response here
+	echo $response;
+    }
+    public function sendSMStoClient($clientph,$orderId){
+        // Account details
+	$apiKey = urlencode('HzkpF5ghup4-nbc0VzgoqdDWDLv1fIziHgmdu4trc7');
+	
+	// Message details
+    //$numbers = array($orderMobl, 447987654321);
+    //$order=Order::
+	$sender = urlencode('Eat Chinese.ie');
+	$message = rawurlencode('You have new order ID:'.$orderId);
+ 
+	//$numbers = implode(',', $numbers);
+ 
+	// Prepare data for POST request
+	$data = array('apikey' => $apiKey, 'numbers' => $clientph, "sender" => $sender, "message" => $message);
+ 
+	// Send the POST request with cURL
+	$ch = curl_init('https://api.txtlocal.com/send/');
+	curl_setopt($ch, CURLOPT_POST, true);
+	curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	$response = curl_exec($ch);
+	curl_close($ch);
+	
+	// Process your response here
+	echo $response;
     }
     public function getFood($tbl_string){
         
@@ -351,6 +440,22 @@ class OrderController extends Controller
     
         $order->save();
        return "clientRes success";}
+       public function clientUpdate2(Request $request, $tblName)
+       {
+           $order= Order::where('orderFoodTbl',$tblName)->first();
+       
+       if($request->has("clientRes")){
+   
+           $order->clientRes=$request->clientRes;
+       }
+       
+           $order->save();
+           $order_id=$order->id;
+            event(new \App\Events\ClientRes($order_id));
+           $user=$session($order_id);
+            //$user=User::where("id",$user_id)->first();
+            $user->notify(new ClientResNote($order_id));
+          return "clientRes2 success";}
     public function destroy($id)
     {
         //

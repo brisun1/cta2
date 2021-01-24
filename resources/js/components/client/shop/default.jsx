@@ -27,13 +27,13 @@ class Default extends Component {
         this.setState({ orderMFShow: false });
         this.setState({ promFShow: !this.state.promFShow });
     };
-    handleChange = event => {
-        const { name, value } = event.target;
-        var inputs = { ...this.state.inputs };
-        inputs[name] = value;
+    // handleChange = event => {
+    //     const { name, value } = event.target;
+    //     var inputs = { ...this.state.inputs };
+    //     inputs[name] = value;
 
-        this.setState({ inputs });
-    };
+    //     this.setState({ inputs });
+    // };
 
     getLinks = () => {
         return (
@@ -115,7 +115,7 @@ class Default extends Component {
                     >
                         <NavLink
                             key="bst"
-                            to="/bankStore"
+                            to="/createBank"
                             className="dropdown-item text-primary"
                             activeClassName="bg-warning pl-3 pr-3"
                         >
@@ -160,15 +160,18 @@ class Default extends Component {
                         <div>
                             <h6 className=""> Update Order Mobile</h6>
                             <p>
-                                When you have a new order, we'll send a text
+                                Once you have a new order, we'll send a text
                                 message to your mobile phone(no garantee
-                                received).The best place to see your order is
-                                log in this website. If the number is different,
-                                you can update it here. Please remind your next
-                                new counter as well.
+                                received). The best place to see your order is
+                                still to log in this website. If the number is
+                                different, you can update it here. Please remind
+                                your next new counter for this as well.
                             </p>
                             <div>
-                                Your current order mobile: {shop.orderMobl}{" "}
+                                Your current order mobile:{" "}
+                                {shop.orderMobl
+                                    ? shop.orderMobl
+                                    : shop.cterMobl}{" "}
                                 <span>
                                     <button
                                         className="btn btn-primary ml-3"
@@ -183,7 +186,11 @@ class Default extends Component {
                             {this.state.orderMFShow && (
                                 <UpdateOrderMobl
                                     id={shop.id}
-                                    orderMobl={shop.orderMobl}
+                                    orderMobl={
+                                        shop.orderMobl
+                                            ? shop.orderMobl
+                                            : shop.cterMobl
+                                    }
                                     changeOrderMFShow={this.changeOrderMFShow}
                                 />
                             )}

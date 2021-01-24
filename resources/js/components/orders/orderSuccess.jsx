@@ -2,13 +2,14 @@ import React, { Component, useEffect } from "react";
 import OrderDetail from "./orderDetail";
 import FoodDetail from "./foodDetail";
 import Shop from "./shop";
+import ClientRes from "./clientRes";
 class OrderSuccess extends Component {
     constructor(props) {
         super(props);
         this.state = { food: [], order: {} };
     }
 
-    componentDidMount = () => {
+    componentDidMount() {
         axios
 
             //.post("api/menu/store/?shop_id=" + this.props.shopId, data, {})
@@ -20,13 +21,14 @@ class OrderSuccess extends Component {
 
             .then(res => {
                 // then print response status
-                console.log("show order data" + JSON.stringify(res.data));
+                //console.log("show order data" + JSON.stringify(res.data));
                 // if (res.data == "order success") {
                 //     console.log(res.statusText);
 
                 // }
                 const { food } = res.data;
                 const order = res.data.order.data;
+                //console.log("in orderSuccess order" + JSON.stringify(order));
                 if (food.data) {
                     this.setState({ food: food.data });
                 }
@@ -34,13 +36,15 @@ class OrderSuccess extends Component {
                     this.setState({ order: order[0] });
                 }
             });
-    };
+    }
 
     render() {
         const { order } = this.state;
         const { shop } = this.props;
         return (
             <div>
+                client Res
+                <ClientRes />
                 <h5>Order Success</h5>
                 <hr />
                 <div className="text-success">

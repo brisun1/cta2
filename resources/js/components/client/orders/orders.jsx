@@ -122,7 +122,14 @@ class Orders extends Component {
                                 //has no order. It caused error!!!!!!
                                 {
                                     return (
-                                        <div key={"order" + i}>
+                                        <div
+                                            key={"order" + i}
+                                            className={
+                                                order.clientRes[i]
+                                                    ? ""
+                                                    : "bg-warning"
+                                            }
+                                        >
                                             <div
                                                 style={{
                                                     backgroundColor: "#e6e5e3",

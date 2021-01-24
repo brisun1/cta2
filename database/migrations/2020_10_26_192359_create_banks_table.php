@@ -19,9 +19,9 @@ class CreateBanksTable extends Migration
             $table->string('ac_name',30);
             $table->string('owner_name',30);
             $table->string('contactPh',30);
-            $table->string('ownerPh',30);
-            $table->string('sort_code',8);
-            $table->string('account',10);
+            $table->string('ownerPh',30)->nullable();
+            $table->string('sort_code',12);
+            $table->string('account',16);
             $table->string('iban',30);
             $table->boolean('approved');
             $table->string('license');

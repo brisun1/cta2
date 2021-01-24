@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import axios from "axios";
+import formValidate from "../validation/formValidate";
 //import { useFormik } from "formik";
 
 class EditShop extends Component {
@@ -73,111 +74,21 @@ class EditShop extends Component {
         inputs[name] = value;
 
         this.setState({ inputs });
-
-        let errors = this.state.errors;
-
-        switch (name) {
-            case "shopName":
-                errors.shopName =
-                    value.length < 5
-                        ? "Full Name must be 5 characters long!"
-                        : "";
-                break;
-            case "addr":
-                errors.addr =
-                    value.length < 5
-                        ? "Address must be 5 characters long!"
-                        : "";
-                break;
-            case "area":
-                errors.area =
-                    value.length < 5 ? "Area must be 5 characters long!" : "";
-                break;
-            case "phone":
-                errors.phone =
-                    value.length < 5 ? "phone must be 5 characters long!" : "";
-                break;
-            case "ownerName":
-                errors.ownerName =
-                    value.length < 5
-                        ? "ownerName must be 5 characters long!"
-                        : "";
-                break;
-            case "ownerMobl":
-                errors.ownerMobl =
-                    value.length < 5
-                        ? "ownerMobl must be 5 characters long!"
-                        : "";
-                break;
-            case "cterMobl":
-                errors.cterMobl =
-                    value.length < 5
-                        ? " counter Mobl must be 5 characters long!"
-                        : "";
-                break;
-            case "orderMobl":
-                errors.orderMobl =
-                    value.length < 5
-                        ? "orderMobl must be 5 characters long!"
-                        : "";
-                break;
-
-            case "weekOpen":
-                errors.weekOpen =
-                    value.length < 2
-                        ? "Open at must be 2 characters long!"
-                        : "";
-                break;
-            case "weekClose":
-                errors.weekClose =
-                    value.length < 2
-                        ? "closeAt must be 2 characters long!"
-                        : "";
-                break;
-            case "friOpen":
-                errors.friOpen =
-                    value.length < 2
-                        ? "Open at must be 2 characters long!"
-                        : "";
-                break;
-            case "friClose":
-                errors.friClose =
-                    value.length < 2
-                        ? "closeAt must be 2 characters long!"
-                        : "";
-                break;
-            case "satOpen":
-                errors.satOpen =
-                    value.length < 2
-                        ? "Open at must be 2 characters long!"
-                        : "";
-                break;
-            case "satClose":
-                errors.satClose =
-                    value.length < 2
-                        ? "closeAt must be 2 characters long!"
-                        : "";
-                break;
-            case "sunOpen":
-                errors.sunOpen =
-                    value.length < 2
-                        ? "Open at must be 2 characters long!"
-                        : "";
-                break;
-            case "sunClose":
-                errors.sunClose =
-                    value.length < 2
-                        ? "closeAt must be 2 characters long!"
-                        : "";
-                break;
-
-            default:
-                break;
+        const { errors } = this.state;
+        if (errors[name]) this.validateInput();
+        //this.setState({ errors });
+    };
+    validateInput = () => {
+        const { name } = event.target;
+        let errors = { ...this.state.errors };
+        if (!event.target.checkValidity()) {
+            errors[name] = event.target.validationMessage;
+            //console.log("in blur");
+            this.setState({ errors });
+        } else {
+            errors[name] = "";
+            this.setState({ errors });
         }
-
-        this.setState({ errors, [name]: value }, () => {
-            console.log(errors);
-        });
     };
     onFileChange = event => {
         this.setState({
@@ -205,60 +116,96 @@ class EditShop extends Component {
         });
     };
 
-    handleSubmit = event => {
+    handleSubmit = async event => {
+        //handleSubmit = event => {
         event.preventDefault();
+        let errors = formValidate();
+        if (errors) this.setState({ errors });
+        else {
+            //setErrors(validate());
+            //axios.post("api/clientForm", this.state).then(response => {});
+            const data = new FormData();
+            // for (var x = 0; x < this.state.selectedFile.length; x++) {
+            //     data.append("image", this.state.selectedFile[x]);
+            // }
+            data.append("image", this.state.selectedFile);
+            if (this.state.promPic) data.append("promPic", this.state.promPic);
+            if (this.state.promPic2)
+                data.append("promPic2", this.state.promPic2);
+            if (this.state.promPic3)
+                data.append("promPic3", this.state.promPic3);
+            //data.append("image1", this.state.selectedFiles);
+            // for (let [key, value] of Object.entries(this.state.ninput)) {
+            //     data.set("${key}", "${value}");
+            // }
 
-        //setErrors(validate());
-        //axios.post("api/clientForm", this.state).then(response => {});
-        const data = new FormData();
-        // for (var x = 0; x < this.state.selectedFile.length; x++) {
-        //     data.append("image", this.state.selectedFile[x]);
-        // }
-        data.append("image", this.state.selectedFile);
-        if (this.state.promPic) data.append("promPic", this.state.promPic);
-        if (this.state.promPic2) data.append("promPic2", this.state.promPic2);
-        if (this.state.promPic3) data.append("promPic3", this.state.promPic3);
-        //data.append("image1", this.state.selectedFiles);
-        // for (let [key, value] of Object.entries(this.state.ninput)) {
-        //     data.set("${key}", "${value}");
-        // }
-
-        const o = Object.keys(this.state.inputs);
-        for (let i = 0; i <= o.length - 1; i++) {
-            data.set(o[i], this.state.inputs[o[i]]);
-        }
-        // const config = {
-        //     headers: {
-        //         "content-type": "application/x-www-form-urlencoded"
-        //     }
-        // };
-        console.log("dddd" + JSON.stringify(data));
-
-        axios
-            .post("api/shop/update", data, {
-                params: {
-                    _method: "PUT"
-                }
-            })
-
-            .then(res => {
-                // then print response status
-
-                //console.log("res" + JSON.stringify(res));
-                if (res.data == "shop success")
+            const o = Object.keys(this.state.inputs);
+            for (let i = 0; i <= o.length - 1; i++) {
+                data.set(o[i], this.state.inputs[o[i]]);
+            }
+            // const config = {
+            //     headers: {
+            //         "content-type": "application/x-www-form-urlencoded"
+            //     }
+            // };
+            // console.log("dddd" + JSON.stringify(data));
+            try {
+                let res = await axios.post("api/shop/update", data, {
+                    params: {
+                        _method: "PUT"
+                    }
+                });
+                if (res.status === 200 && res.data == "shop update success")
                     window.location.replace("/dashBoard");
-            });
+            } catch (error) {
+                let errs = { ...this.state.errors };
+                let newErrors = error.response.data.errors;
+
+                // console.log(
+                //     "errors" + JSON.stringify(error.response.data.errors)
+                // );
+                for (const key in newErrors) {
+                    errs[key] = newErrors[key][0];
+                }
+                this.setState({ errors: errs });
+            }
+            ////
+            // axios
+            //     .post("api/shop/update", data, {
+            //         params: {
+            //             _method: "PUT"
+            //         }
+            //     })
+
+            //     .then(res => {
+            //         // then print response status
+            //         console.log("errordata");
+            //         if (res.status === 422) {
+            //             console.log("errordata" + res.errors.area);
+            //             console.log("errordata" + res.errors);
+            //         }
+            //         //console.log("res" + JSON.stringify(res));
+            //         if (res.data == "shop update success")
+            //             console.log("res" + JSON.stringify(res));
+            //         // window.location.replace("/dashBoard");
+            //     });
+        }
     };
 
     render() {
         const { inputs, errors } = this.state;
+        console.log("props in editshop" + JSON.stringify(this.props.shop));
         return (
             <div>
                 <br />
                 <br />
                 <h5 className="text-center">Edit Shop</h5>
                 <hr />
-                <form onSubmit={this.handleSubmit} className="form-horizontal">
+                <form
+                    noValidate
+                    onSubmit={this.handleSubmit}
+                    className="form-horizontal"
+                >
                     <div className="form-group">
                         <label className="control-label">
                             Shop name:
@@ -267,6 +214,10 @@ class EditShop extends Component {
                                 type="text"
                                 value={inputs.shopName}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                minLength={2}
+                                maxLength={30}
+                                required
                             />
                         </label>
 
@@ -283,6 +234,10 @@ class EditShop extends Component {
                                 type="text"
                                 value={inputs.addr}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                minLength={5}
+                                maxLength={80}
+                                required
                             />
                         </label>
 
@@ -298,6 +253,10 @@ class EditShop extends Component {
                                 type="text"
                                 value={inputs.area}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                minLength={2}
+                                maxLength={30}
+                                required
                             />
                         </label>
 
@@ -310,9 +269,13 @@ class EditShop extends Component {
                             Shop phone:
                             <input
                                 name="phone"
-                                type="text"
+                                type="tel"
                                 value={inputs.phone}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                minLength={10}
+                                maxLength={30}
+                                required
                             />
                         </label>
 
@@ -326,9 +289,13 @@ class EditShop extends Component {
                             Shop owner's name:
                             <input
                                 name="ownerName"
-                                type="text"
+                                type="tel"
                                 value={inputs.ownerName}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                minLength={10}
+                                maxLength={30}
+                                required
                             />
                         </label>
                         {errors.ownerName && (
@@ -340,9 +307,12 @@ class EditShop extends Component {
                             Shop owner's mobile:
                             <input
                                 name="ownerMobl"
-                                type="text"
-                                value={inputs.ownerMobl}
+                                type="tel"
+                                value={inputs.ownerMobl || ""}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                minLength={10}
+                                maxLength={30}
                             />
                         </label>
 
@@ -355,9 +325,13 @@ class EditShop extends Component {
                             Counter's mobile:
                             <input
                                 name="cterMobl"
-                                type="text"
+                                type="tel"
                                 value={inputs.cterMobl}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                minLength={10}
+                                maxLength={30}
+                                required
                             />
                         </label>
 
@@ -370,9 +344,12 @@ class EditShop extends Component {
                             Order mobile for web use:
                             <input
                                 name="orderMobl"
-                                type="text"
-                                value={inputs.orderMobl}
+                                type="tel"
+                                value={inputs.orderMobl || ""}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                minLength={10}
+                                maxLength={30}
                             />
                         </label>
 
@@ -388,6 +365,8 @@ class EditShop extends Component {
                                 type="time"
                                 value={inputs.weekOpen}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                required
                             />
                         </label>
 
@@ -402,6 +381,8 @@ class EditShop extends Component {
                                 type="time"
                                 value={inputs.weekClose}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                required
                             />
                         </label>
                         {errors.weekClose && (
@@ -416,6 +397,8 @@ class EditShop extends Component {
                                 type="time"
                                 value={inputs.friOpen}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                required
                             />
                         </label>
 
@@ -430,6 +413,8 @@ class EditShop extends Component {
                                 type="time"
                                 value={inputs.friClose}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                required
                             />
                         </label>
                         {errors.friClose && (
@@ -444,6 +429,8 @@ class EditShop extends Component {
                                 type="time"
                                 value={inputs.satOpen}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                required
                             />
                         </label>
 
@@ -458,6 +445,8 @@ class EditShop extends Component {
                                 type="time"
                                 value={inputs.satClose}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                required
                             />
                         </label>
                         {errors.satClose && (
@@ -472,6 +461,8 @@ class EditShop extends Component {
                                 type="time"
                                 value={inputs.sunOpen}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                required
                             />
                         </label>
 
@@ -485,6 +476,8 @@ class EditShop extends Component {
                                 type="time"
                                 value={inputs.sunClose}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                required
                             />
                         </label>
                         {errors.sunClose && (
@@ -497,8 +490,12 @@ class EditShop extends Component {
                             <input
                                 name="promTxt1"
                                 type="text"
-                                value={inputs.promTxt1}
+                                value={inputs.promTxt1 || ""}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                minLength={5}
+                                maxLength={150}
+                                required
                             />
                         </label>
 
@@ -512,8 +509,11 @@ class EditShop extends Component {
                             <input
                                 name="promTxt2"
                                 type="text"
-                                value={inputs.promTxt2}
+                                value={inputs.promTxt2 || ""}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                minLength={3}
+                                maxLength={150}
                             />
                         </label>
 
@@ -527,8 +527,11 @@ class EditShop extends Component {
                             <input
                                 name="promTxt3"
                                 type="text"
-                                value={inputs.promTxt3}
+                                value={inputs.promTxt3 || ""}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                minLength={3}
+                                maxLength={150}
                             />
                         </label>
 

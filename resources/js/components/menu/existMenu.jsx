@@ -25,12 +25,7 @@ class ExistMenu extends Component {
             isDeli: !this.state.isDeli
         });
     };
-    testSms = () => {
-        axios.get("/sms/send").then(res => {
-            console.log("smsRRRRRR" + JSON.stringify(res));
-        });
-    };
-    ////
+    
     // showModal = () => {
     //     this.setState(
     //         { modalOpen: true }
@@ -69,6 +64,7 @@ class ExistMenu extends Component {
         // );
         const styleMenu = modalOpen ? { backgroundColor: "#A9A9A9" } : null;
         const styleBtn = modalOpen ? { opacity: 0.4 } : null;
+        //const styleOrdered = { backgroundColor: "#c4f5d8" };
         if (menu.length == 0) {
             return (
                 <div>
@@ -112,11 +108,12 @@ class ExistMenu extends Component {
                             />
                         </div>
                     ) : null}
-                    <h6 className="text-center">
-                        Menu<button onClick={this.testSms}>send sms</button>
-                    </h6>
+                    <h5 className="text-center">
+                        Menu
+                    </h5>
+                    <hr/>
                     <form onSubmit={this.props.handleSubmitFoodForm}>
-                        <table className="table table-bordered">
+                        <table className="table table-bordered" boder={1}>
                             <thead>
                                 <tr className="">
                                     <td></td>
@@ -126,7 +123,7 @@ class ExistMenu extends Component {
                                     <td>Qty</td>
                                     <td>Price</td>
 
-                                    <td></td>
+                                    <td style={{width:155}}></td>
                                 </tr>
                             </thead>
                             <tbody>
@@ -134,17 +131,18 @@ class ExistMenu extends Component {
                                     return (
                                         <Fragment key={"divk" + ci}>
                                             <tr className="">
-                                                <td></td>
-                                                <td></td>
+                                                
                                                 <td
                                                     key={"c" + ci}
                                                     id={"cat" + ci}
                                                     name="cat"
-                                                    className=""
+                                                    className="text-center"
+                                                    colSpan={4}
+                                                    
                                                 >
                                                     {cat}
                                                 </td>
-                                                <td></td>
+                                               
                                             </tr>
 
                                             {menu.map((food, index) => {
@@ -165,13 +163,9 @@ class ExistMenu extends Component {
                                                                 "--" +
                                                                 index
                                                             }
-                                                            className={
-                                                                food.orderQty >
-                                                                0
-                                                                    ? "bg-info"
-                                                                    : ""
-                                                            }
+                                                           
                                                         >
+                                                            
                                                             <td
                                                                 key={
                                                                     "fid" +
@@ -186,6 +180,15 @@ class ExistMenu extends Component {
                                                                     index
                                                                 }
                                                                 name="fid"
+                                                                 style={
+                                                                food.orderQty >
+                                                                0
+                                                                    ? {
+                                                                          backgroundColor:
+                                                                              "#c4f5d8"
+                                                                      }
+                                                                    : null
+                                                            }
                                                             >
                                                                 {food.fid}
                                                             </td>
@@ -204,6 +207,15 @@ class ExistMenu extends Component {
                                                                 }
                                                                 name="fname"
                                                                 className=""
+                                                                 style={
+                                                                food.orderQty >
+                                                                0
+                                                                    ? {
+                                                                          backgroundColor:
+                                                                              "#c4f5d8"
+                                                                      }
+                                                                    : null
+                                                            }
                                                             >
                                                                 {food.fname}
 
@@ -230,6 +242,15 @@ class ExistMenu extends Component {
                                                                 }
                                                                 name="price"
                                                                 className=""
+                                                                 style={
+                                                                food.orderQty >
+                                                                0
+                                                                    ? {
+                                                                          backgroundColor:
+                                                                              "#c4f5d8"
+                                                                      }
+                                                                    : null
+                                                            }
                                                             >
                                                                 {food.price}
                                                             </td>
@@ -248,6 +269,15 @@ class ExistMenu extends Component {
                                                                 }
                                                                 name="note"
                                                                 className=""
+                                                                 style={
+                                                                food.orderQty >
+                                                                0
+                                                                    ? {
+                                                                          backgroundColor:
+                                                                              "#c4f5d8"
+                                                                      }
+                                                                    : null
+                                                            }
                                                             >
                                                                 {food.note}
                                                             </td>
@@ -284,7 +314,7 @@ class ExistMenu extends Component {
                                                                 name="subTotal"
                                                                 className=""
                                                             >
-                                                                {Math.round(
+                                                                {food.subTotal && Math.round(
                                                                     food.subTotal *
                                                                         100
                                                                 ) / 100}
@@ -359,7 +389,7 @@ class ExistMenu extends Component {
                                                                 </button>
                                                                 <button
                                                                     type="button"
-                                                                    className="ml-2 text-danger"
+                                                                    className="ml-2 mr-0 text-danger"
                                                                     onClick={e =>
                                                                         this.props.handleDelete(
                                                                             e,
@@ -386,16 +416,11 @@ class ExistMenu extends Component {
                             <tfoot>
                                 <tr>
                                     <td></td>
-                                    <td>Total:</td>
-                                    <td></td>
-                                    <td></td>
-
-                                    <td></td>
-                                    <td>
-                                        {this.props.getTotal()
+                                    <td colSpan={5}>Total:
+                                        <span className="float-right">{this.props.getTotal()
                                             ? this.props.getTotal().toFixed(2)
                                             : null}
-                                    </td>
+                                    </span></td>
                                 </tr>
                             </tfoot>
                         </table>

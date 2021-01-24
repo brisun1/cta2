@@ -8,7 +8,19 @@ use Illuminate\Support\Facades\Auth;
 
 class Menu extends Model
 {
- 
+//     protected $table;
+//     public function __construct($str_tbl = null, array $attributes = array())
+// {
+//     $this->table = "menu_".$str_tbl;
+
+//     parent::__construct($attributes);
+// }
+    // public function __construct($str_tbl)
+    // {
+    //    // dd($str_tbl);
+    //    parent::__construct();
+    //     $this->table ="menu_".$str_tbl;
+    // }
     // function __construct($shop_id=null)
     // {
     //     parent::__construct();

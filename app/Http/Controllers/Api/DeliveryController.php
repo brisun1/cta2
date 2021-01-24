@@ -39,6 +39,16 @@ class DeliveryController extends Controller
      */
     public function store(Request $request,$shopId)
     {
+        $this->validate($request, [
+            'dist1'=>'required|numeric|min:1|max:10',
+            'dist15'=>'required|numeric|min:1|max:30',
+            'dist2'=>'required|numeric|min:1|max:30',
+            'dist25'=>'required|numeric|min:1|max:30',
+            'dist3'=>'required|numeric|min:1|max:30',
+            'dist4'=>'required|numeric|min:1|max:30',
+            //'dist5'=>'required|numeric|min:1|max:30',
+            'servLimit'=>'required|numeric|min:1|max:30',
+        ]);
         $deli=new Delivery();
         //validation goes here
         $dist1=$request->dist1;
@@ -74,8 +84,14 @@ class DeliveryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    public function custShow($shopId)
+    {
+        $data=Delivery::where('shop_id',$shopId)->first();
+        return (new DeliveryResource($data));
+    }
     public function show()
     {
+        
         if(Auth::check()){
             $shop=Auth::user()->shops->first();
             if($shop->delivery){
@@ -115,6 +131,27 @@ class DeliveryController extends Controller
      */
     public function update(Request $request)
     {
+        $this->validate($request, [
+            'dist1'=>'required|numeric|min:1|max:10',
+            'dist15'=>'required|numeric|min:1|max:30',
+            'dist2'=>'required|numeric|min:1|max:30',
+            'dist25'=>'required|numeric|min:1|max:30',
+            'dist3'=>'required|numeric|min:1|max:30',
+            'dist4'=>'required|numeric|min:1|max:30',
+            //'dist5'=>'required|numeric|min:1|max:30',
+            'servLimit'=>'required|numeric|min:1|max:30',
+            
+            // 'ac_name' => 'required|string|min:5|max:30',
+            
+            // 'owner_name' => 'required|string|min:5|max:30',
+            // //'tel' => 'required|string|max:40',
+            // 'ownerPh' => 'required|string|min:10|max:40',
+            // 'contactPh' => 'required|string|min:10|max:40',
+            // 'sort_code'=>'required|string|min:6|max:8',
+            // 'account'=>'required|numeric|digits_between:8,20',
+            // 'licenseFile'=>'required|image|mimes:jpeg,jpg,bmp,png,pdf|max:10240',
+            // 'statemtFile'=>'required|image|mimes:jpeg,jpg,bmp,png,pdf|max:10240',
+                ]); 
         if(Auth::check()){
             $shop=Auth::user()->shops->first();
             if($shop->delivery){

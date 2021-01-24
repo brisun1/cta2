@@ -1,5 +1,11 @@
 import React from "react";
-import { CardElement } from "@stripe/react-stripe-js";
+import {
+    CardElement,
+    CardNumberElement,
+    CardExpiryElement,
+    CardCvcElement,
+    PaymentRequestButtonElement
+} from "@stripe/react-stripe-js";
 import "./cardSectionStyles.css";
 //import "./stripeApp.css";
 const CARD_ELEMENT_OPTIONS = {
@@ -22,10 +28,35 @@ const CARD_ELEMENT_OPTIONS = {
 
 function CardSection() {
     return (
-        <label>
-            Card details
-            <CardElement options={CARD_ELEMENT_OPTIONS} />
-        </label>
+        // <label>
+        //     Card details
+        //     <CardElement options={CARD_ELEMENT_OPTIONS} />
+        // </label>
+        <div>
+            Card Number:
+            <br />
+            <label>
+                <CardNumberElement />
+            </label>
+            <br />
+            Expiry Date:
+            <br />
+            <label>
+                <CardExpiryElement />
+            </label>
+            <br />
+            CVC:{" "}
+            <span style={{ fontSize: 14 }}>
+                (Last 3-4 digits on the back of your card.)
+            </span>
+            <br />
+            <label>
+                <CardCvcElement />
+            </label>
+            {/* <label>
+                <PaymentRequestButtonElement />
+            </label> */}
+        </div>
     );
 }
 

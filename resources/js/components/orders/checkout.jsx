@@ -1,8 +1,9 @@
 import React, { Component, Fragment } from "react";
 import ReactDOM from "react-dom";
+import formValidate from "../client/validation/formValidate";
 //import getDist from "../maps/getDist";
 //import { withRouter } from "react-router";
-
+import OrderPhForm from "./orderPhForm";
 import "../../../css/style.css";
 import "../modals/orderPh/index.css";
 import PhModal from "../modals/orderPh/phModal";
@@ -19,8 +20,12 @@ class Checkout extends Component {
             shop: this.props.shop,
             menu: this.props.menu,
             sum: sum,
-            phModalOpen: false,
-            phonePwd: null
+
+            //phModalOpen: false,
+
+            phonePwd: null,
+            phpErrors: {}
+
             // delivery: [],
             // deliPrice: "",
             // isDeli: true,
@@ -32,87 +37,102 @@ class Checkout extends Component {
             //cashConfirmed:false
         };
     }
-
-    handleContinue = e => {
-        const { cardPay } = this.props.custData;
-
-        this.handleSubmit(e);
-
-        if (cardPay) {
-            this.props.handleNextStep();
-        } else {
-            this.props.handleCashConfirm();
-
-            this.setState({ phModalOpen: true });
-            this.showModal(event);
-        }
-    };
-
-    handleSubmit = event => {
-        event.preventDefault();
+    // validateInput = () => {
+    //     const { name } = event.target;
+    //     let errors = { ...this.state.errors };
+    //     if (!event.target.checkValidity()) {
+    //         errors[name] = event.target.validationMessage;
+    //         //console.log("in blur");
+    //         this.setState({ errors });
+    //     } else {
+    //         errors[name] = "";
+    //         this.setState({ errors });
+    //     }
+    // };
+    handleSubmit = async e => {
+        e.preventDefault();
         const { cardPay, btnClicked } = this.props.custData;
-        if (cardPay == false) {
-            this.props.handleBtnClicked();
-        }
-        let bool = false;
-        const c = this.props.custData.btnClicked;
-        if (btnClicked.length > 5) {
-            let b = btnClicked.slice(-6);
-            let miniutes = (b[5] - b[0]) / 6000;
-            if (!cardPay && miniutes < 15) {
-                bool = true;
+        let errors = formValidate();
+        if (errors) this.props.handleInputErrors(errors);
+        else {
+            if (cardPay == false) {
+                this.props.handleBtnClicked();
             }
-        }
+            let bool = false;
+            const c = this.props.custData.btnClicked;
+            if (btnClicked.length > 5) {
+                let b = btnClicked.slice(-6);
+                let miniutes = (b[5] - b[0]) / 6000;
+                if (!cardPay && miniutes < 15) {
+                    bool = true;
+                }
+            }
 
-        if (bool) {
-            alert(
-                "You have clicked 'Continue' too many time, please try again after a while."
-            );
-        } else {
-            //console.log("srefpppppp" + JSON.stringify(this.props));
+            if (bool) {
+                alert(
+                    "You have clicked 'Continue' too many time, please try again after a while."
+                );
+            } else {
+                //console.log("srefpppppp" + JSON.stringify(this.props));
 
-            // const { fid, fname, price, note, cat } = this.state.inpVal;
-            // const data = {
-            //     cat: cat,
-            //     isMain: this.state.isMains,
-            //     fid: fid.val,
-            //     fname: fname.val,
-            //     price: price.val,
-            //     catNum: fname.catNum,
-            //     note: note.val,
-            //     frice: this.state.frice
-            // };
-            const data = this.props.custData;
-            data.sum = this.state.sum;
-            //const { shop } = this.props;
-            //const tblString=this.props.custData.orderTblString;
+                // const { fid, fname, price, note, cat } = this.state.inpVal;
+                // const data = {
+                //     cat: cat,
+                //     isMain: this.state.isMains,
+                //     fid: fid.val,
+                //     fname: fname.val,
+                //     price: price.val,
+                //     catNum: fname.catNum,
+                //     note: note.val,
+                //     frice: this.state.frice
+                // };
+                const data = this.props.custData;
+                data.sum = this.state.sum;
+                //const { shop } = this.props;
+                //const tblString=this.props.custData.orderTblString;
+                try {
+                    let res = await axios.post(
+                        "api/order/store/" + this.props.custData.orderTblString,
+                        data,
+                        { baseURL: "/" }
+                    );
+                    if (res.status === 200 && res.data == "order success")
+                        this.props.handleSubmitFoodForm(e);
+                    const { cardPay } = this.props.custData;
+                    if (!cardPay) this.props.handleCashConfirm();
+                    else this.props.handleNextStep();
+                } catch (error) {
+                    let errs = { ...this.state.errors };
+                    let newErrors = error.response.data.errors;
 
-            axios
-
-                //.post("api/menu/store/?shop_id=" + this.props.shopId, data, {})
-                .post(
-                    "api/order/store/" + this.props.custData.orderTblString,
-                    data,
-                    { baseURL: "/" }
-                )
-
-                .then(res => {
-                    // then print response status
-                    console.log("check responnn" + res.data);
-                    if (res.data == "order success") {
-                        console.log(res.statusText);
-                        const { cardPay } = this.props.custData;
-
-                        if (cardPay) {
-                            this.props.handleNextStep();
-                        } else {
-                            this.props.handleCashConfirm();
-
-                            this.setState({ phModalOpen: true });
-                            this.showModal(event);
-                        }
+                    console.log("errors" + JSON.stringify(error.response.data));
+                    for (const key in newErrors) {
+                        errs[key] = newErrors[key][0];
                     }
-                });
+                    this.setState({ phpErrors: errs });
+                }
+
+                //         // console.log("check responnn" + res.data);
+                //         if (res.data == "order success") {
+                //             console.log(res.statusText);
+                //             const { cardPay } = this.props.custData;
+                //             this.props.handleSubmitFoodForm(event);
+                //             if (!cardPay) {
+                //                 //this.props.handleNextStep();
+                //                 this.props.handleCashConfirm();
+
+                //                 // if (
+                //                 //     Object.keys(this.props.phpErrors).length === 0
+                //                 // ) {
+                //                 //     this.props.handleShowOrderPhForm();
+                //                 //this.setState({ showOrderPhForm: true });
+                //                 //this.setState({ phModalOpen: true });
+                //                 //this.showModal(event);
+                //                 //}
+                //             }
+                //       }
+                //  });
+            }
         }
     };
     handlePhonePwdChange = e => {
@@ -130,47 +150,82 @@ class Checkout extends Component {
                 }
             )
             .then(res => {
-                console.log("pwddddddddd" + JSON.stringify(res));
+                // console.log("pwddddddddd" + JSON.stringify(res));
                 if (res.data == "pwd matched") {
                     this.props.handleSubmitFoodForm(e);
                     // if (this.props.custData.foodSubmited == true) {
-                    // this.props.handleNextStep();
-                    // this.props.handleNextStep();
+
                     // }
                 }
             });
     };
+    showPhpErrs = () => {
+        //const { phpErrors } = this.props;
 
+        if (Object.keys(this.props.phpErrors).length > 0) {
+            // return Object.keys(phpErrors).map(key => {
+            //     return (
+            //         <div className="text-danger" key={key}>
+            //             {key + ": " + phpErrors[key]}
+            //         </div>
+            //     );
+            // });
+            return (
+                <div className="text-danger">
+                    A system error occured. Please go back and make a new order!
+                </div>
+            );
+        }
+    };
+
+    // handleOrderMobileChange = () => {
+    //     this.setState({ orderMobile: event.target.value });
+    // };
+    orderPhpErrs = () => {
+        const { phpErrors } = this.state;
+
+        if (Object.keys(phpErrors).length > 0) {
+            return Object.keys(phpErrors).map(key => {
+                return (
+                    <div className="text-danger" key={key}>
+                        {phpErrors[key]}
+                    </div>
+                );
+            });
+        }
+    };
     submitOrderPh = event => {
         event.preventDefault(event);
         //console.log("from modal" + event.target.orderMobile.value);
+        if (!this.props.errors.orderMobile) {
+            this.props.handleOrderMobile(event);
+            //send sms
+            let rand = Array(5)
+                .fill(
+                    "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+                )
+                .map(function(x) {
+                    return x[Math.floor(Math.random() * x.length)];
+                })
+                .join("");
+            let data = {};
+            // let orderMobile = "";
+            // if (event.target.orderMobile.value) {
+            //     orderMobile = event.target.orderMobile.value;
+            // } else {
+            //     orderMobile = this.props.custData.custPhone;
+            // }
+            data.orderMobile = this.props.custData.orderMobile;
+            data.orderPwd = rand;
+            data.pwdTimeStamp = new Date();
+            this.props.custUpdate(data);
+            this.setState({ cashConfirmed: true });
+            //there is event
+            //this.closeModal(event);
+            //this.props.handleSubmitFoodForm(event);
 
-        this.props.handleOrderMobile(event);
-        //send sms
-        let rand = Array(5)
-            .fill(
-                "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-            )
-            .map(function(x) {
-                return x[Math.floor(Math.random() * x.length)];
-            })
-            .join("");
-        let data = {};
-        let orderMobile = "";
-        if (event.target.orderMobile.value) {
-            orderMobile = event.target.orderMobile.value;
-        } else {
-            orderMobile = this.props.custData.custPhone;
+            this.props.handleNextStep();
         }
-        data.orderMobile = orderMobile;
-        data.orderPwd = rand;
-        data.pwdTimeStamp = new Date();
-        this.props.custUpdate(data);
-        this.setState({ cashConfirmed: true });
-        //there is event
-        this.closeModal(event);
-        this.props.handleSubmitFoodForm(event);
-        this.props.handleNextStep();
     };
     // custUpdate = data => {
     //     event.preventDefault();
@@ -230,11 +285,13 @@ class Checkout extends Component {
     //     }
     //     return classes;
     // };
+
     render() {
-        console.log("menu render state" + this.state.menu);
+        // console.log("menu render state" + this.state.menu);
 
         const { menu } = this.state;
         const { custData } = this.props;
+        const { errors } = this.props;
         const { deliPrice } = custData;
         const cats = [];
 
@@ -245,7 +302,7 @@ class Checkout extends Component {
         if (menu.length == 0) {
             return (
                 <div>
-                    <div>pls up ur menu</div>
+                    <div>The menu for this shop is not available</div>
                 </div>
             );
         } else
@@ -254,7 +311,7 @@ class Checkout extends Component {
                     <h4 className="text-center">Checkout Page</h4>
                     <hr />
                     <label>The food you have ordered is as below:</label>
-                    <button onClick={this.showModal}>show Modal</button>
+
                     {this.state.phModalOpen ? (
                         <PhModal
                             submitOrderPh={this.submitOrderPh}
@@ -497,7 +554,7 @@ class Checkout extends Component {
                             </tr>
                         </tfoot>
                     </table>
-                    <form onSubmit={this.handleSubmit}>
+                    <form noValidate onSubmit={this.handleSubmit}>
                         <label className="text-danger font-weight-bold">
                             Please provide the following infomation to proceed.
                         </label>
@@ -534,53 +591,64 @@ class Checkout extends Component {
                         <label>
                             Your contact number:
                             <input
-                                type="text"
-                                name="custph"
+                                type="tel"
+                                name="custPhone"
                                 className="ml-2"
                                 value={custData.custPhone}
                                 onChange={this.props.handlePhone}
+                                onBlur={this.props.validateInput}
+                                minLength={10}
+                                maxLength={30}
+                                required
                             />
                         </label>
-                        <br />
-                        {custData.isDeli ? (
-                            custData.isDeli && (
+                        {errors.custPhone && (
+                            <p className="text-danger">{errors.custPhone}</p>
+                        )}
+
+                        {custData.isDeli && (
+                            <div>
                                 <label>
                                     Your delivery address:
                                     <input
                                         type="text"
+                                        name="custAddr"
                                         className="ml-2"
                                         size={38}
                                         value={custData.custAddr}
                                         onChange={this.props.handleCustAddr}
+                                        onBlur={this.props.validateAddr}
+                                        minLength={5}
+                                        maxLength={60}
+                                        required
                                     />
                                 </label>
-                            )
-                        ) : (
-                            <div> {""}</div>
+                            </div>
                         )}
-                        {deliPrice == "max"
-                            ? custData.isDeli && (
-                                  <div className="text-warning float-right">
-                                      The delivery address might be too far to
-                                      serve. Please contact the shop.
-                                  </div>
-                              )
-                            : custData.isDeli &&
-                              deliPrice > 0 && (
-                                  <div className="">
-                                      Delivery Price: {deliPrice}
-                                  </div>
-                              )}
+                        {custData.isDeli && errors.custAddr && (
+                            <p className="text-danger">{errors.custAddr}</p>
+                        )}
                         {custData.isDeli && custData.addrError == "NOT_FOUND" && (
                             <div className="text-danger font-weight-light font-italic">
                                 <div>
-                                    We didn't find your address on google map .
+                                    We didn't find your address on Google Maps .
                                     Make sure the food is deliverable !
                                 </div>
                                 <div>And the delivery price may vary.</div>
                             </div>
                         )}
-                        <br />
+                        {custData.isDeli && (
+                            <div className="">
+                                Delivery Price:{" "}
+                                {deliPrice !== "max" && deliPrice}
+                            </div>
+                        )}
+                        {deliPrice == "max" && custData.isDeli && (
+                            <div className="text-warning float-right">
+                                The delivery address might be too far to serve.
+                                Please contact the shop.
+                            </div>
+                        )}
 
                         <div className="d-flex ">
                             <div>Total to pay:</div>
@@ -628,8 +696,14 @@ class Checkout extends Component {
                                 className="formControl"
                                 value={custData.orderMsg}
                                 onChange={this.props.handleOrderMsg}
+                                onBlur={this.props.validateInput}
+                                //minLength={5}
+                                maxLength={120}
                             />
                         </label>
+                        {errors.orderMsg && (
+                            <p className="text-danger">{errors.orderMsg}</p>
+                        )}
                         <hr />
                         <button
                             onClick={this.props.handlePrevStep}
@@ -637,17 +711,38 @@ class Checkout extends Component {
                         >
                             {"< "}Back
                         </button>
+                        {/* {console.log(
+                            "php errors" + JSON.stringify(this.props.phpErrors)
+                        )} */}
+                        {this.orderPhpErrs()}
+
                         <button
                             type="submit"
                             //onClick={this.handleContinue}
+                            disabled={custData.isDeli && !deliPrice}
                             className="btn btn-primary float-right"
                         >
                             Continue
                         </button>
                     </form>
+                    {!custData.cardPay && this.props.showOrderPhForm && (
+                        <>
+                            <hr />
+                            <OrderPhForm
+                                submitOrderPh={this.submitOrderPh}
+                                custPhone={custData.custPhone}
+                                orderMobile={custData.orderMobile}
+                                handleOrderMobileChange={
+                                    this.props.handleOrderMobileChange
+                                }
+                                errors={this.props.errors}
+                                validateInput={this.props.validateInput}
+                            />
+                        </>
+                    )}
                 </div>
             );
     }
 }
-
+//handleSubmitFoodForm for cash is in the modal, for card is in handleSubmit
 export default Checkout;

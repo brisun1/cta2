@@ -7,51 +7,41 @@ class CustomerDetail extends Component {
         return (
             <div>
                 <h6>The order information you provide is as following:</h6>
-                <br />
 
-                <label>Your contact number: &nbsp;{custData.custPhone}</label>
+                <div>Your contact number: &nbsp;{custData.custPhone}</div>
 
-                <br />
-                <label>
-                    {" "}
-                    {custData.isDeli ? "Delivery" : "Self Collection"}
-                </label>
-                <br />
-                {custData.isDeli ? (
-                    custData.isDeli && (
-                        <label>
-                            Delivery address: &nbsp;
-                            {custData.custAddr}
-                        </label>
-                    )
-                ) : (
-                    <div> {""}</div>
+                <div> {custData.isDeli ? "Delivery" : "Self Collection"}</div>
+
+                {custData.isDeli && (
+                    <div>
+                        Delivery address: &nbsp;
+                        {custData.custAddr}
+                    </div>
                 )}
                 {deliPrice == "max" && custData.isDeli && (
-                    <label className="text-warning ">
+                    <div className="text-warning ">
                         Make sure the delivery address is agreed with the shop.
                         And the delivery price may vary.
-                    </label>
+                    </div>
                 )}
-                <br />
+
                 {custData.isDeli && custData.addrError == "NOT_FOUND" && (
-                    <label className="text-danger">
+                    <div className="text-danger">
                         Make sure the address is deliverable. And the delivery
                         price may vary.
-                    </label>
+                    </div>
                 )}
-                <br />
 
-                <label>
+                <div>
                     Total amount to pay: &nbsp;
                     {this.props.getTotal().toFixed(2)}Eur
-                </label>
-                <br />
-                <label>
+                </div>
+
+                <div>
                     Pay method:&nbsp;{custData.cardPay ? "By card" : "By cash"}
-                </label>
-                <br />
-                <label>Message to shop: &nbsp;{custData.orderMsg}</label>
+                </div>
+
+                <div>Message to shop: &nbsp;{custData.orderMsg}</div>
                 <hr />
             </div>
         );

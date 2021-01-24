@@ -146,6 +146,26 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'cat'=>'Category',
+        'cats.*'=>'Category',
+        'menu.*.fid'=>'Food ID',
+        'menu.*.fname'=>'Food Name',
+        'menu.*.price'=>'Price',
+        'menu.*.note'=>'Note',
+        'frPrice'=>'Price for fried rice',
+        'fid.*'=>'Food ID',
+        'fname.*'=>'Food Name',
+        'price.*'=>'Price',
+        'note.*'=>'Note',
+        'custAddr'=>'address',
+        'custPhone'=>'phone number',
+        'orderMbile'=>'mobile number',
+        'orserMsg'=>'message to shop',
+        'deliPrice'=>'delivery price',
+        'isDeli'=>'delivery',
+        'phonePwd'=>'confirmation code',
+        
+    ],
 
 ];

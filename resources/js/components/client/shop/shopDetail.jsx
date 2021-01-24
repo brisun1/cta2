@@ -33,7 +33,9 @@ class ShopDetail extends Component {
                     />
                     <br />
                     <div id="shop_txt" className="d-flex">
-                        <div className="bg-light mr-4">Name:{shop.name}</div>
+                        <div className="bg-light mr-4">
+                            Name:{shop.shopName}
+                        </div>
 
                         <div className="bg-light mr-4">Address:{shop.addr}</div>
 

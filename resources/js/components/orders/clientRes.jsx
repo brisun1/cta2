@@ -5,7 +5,7 @@ import Socketio from "socket.io-client";
 import FoodDetail2 from "./foodDetail2";
 import CustomerDetail from "./customerDetail";
 
-function NewOrder(props) {
+function ClientRes(props) {
     const ref = useRef(false);
     //const { data, setData } = useState[""];
     const [customer, setCustomer] = useState([]);
@@ -19,11 +19,11 @@ function NewOrder(props) {
         host: window.location.hostname + ":6001"
     });
 
-    echo.private("order." + props.user_id)
+    echo.private("order." + props.order_id)
         // .notification(notification => {
         //     console.log("note" + JSON.stringify(notification));
         // })
-        .listen(".UserEvent", e => {
+        .listen(".ResEvent", e => {
             // console.log(
             //     "fff" + ref.current + "in neworder" + JSON.stringify(e.customer)
             // );
@@ -115,29 +115,6 @@ function NewOrder(props) {
                 });
         }
     };
-    const sendRes = (i, orderFoodTbl) => {
-        console.log("in sen res");
-        if (clientRes[i] === false) {
-            let data = { clientRes: true };
-            axios
-                .post("api/order/clientUpdate2/" + orderFoodTbl, data, {
-                    baseURL: "/",
-                    params: {
-                        _method: "PUT"
-                    }
-                })
-
-                .then(res => {
-                    console.log("clientRes" + res.data);
-                    if (res.data == "clientRes success") {
-                        let cr = [...clientRes];
-                        cr[i] = true;
-                        setClientRes(cr);
-                        pauseAudio();
-                    }
-                });
-        }
-    };
     function playAudio() {
         //this.setState({ clicked: true });
         var x = document.getElementById("newAudio");
@@ -174,6 +151,7 @@ function NewOrder(props) {
                     </audio>
                     {playAudio()}
                 </div>
+                <div>Client res page</div>
                 {customer.map((cust, i) => {
                     if (Object.keys(cust).length > 0) {
                         // console.log("food" + food[i]);
@@ -188,15 +166,8 @@ function NewOrder(props) {
                                 }
                             >
                                 <h6 style={{ textDecoration: "underline" }}>
-                                    New order:
+                                    Cliend Res:
                                 </h6>
-                                <button
-                                    onClick={() =>
-                                        sendRes(i, cust.orderFoodTbl)
-                                    }
-                                >
-                                    send Res
-                                </button>
                                 <div>
                                     Order No.:
                                     <span className="text-success">
@@ -206,8 +177,8 @@ function NewOrder(props) {
                                         {cust.created_at.substring(11, 16)}
                                     </span>
                                 </div>
-                                <FoodDetail2 foods={food[i]} />
-                                <CustomerDetail order={cust} />
+                                {/* <FoodDetail2 foods={food[i]} />
+                                <CustomerDetail order={cust} /> */}
                             </div>
                         );
                     }
@@ -218,13 +189,13 @@ function NewOrder(props) {
         return (
             <div>
                 <br />
-                <div>Waiting for new order . . . . . .</div>
+                <div>Waiting for Clent Res . . . . . .</div>
                 <hr />
             </div>
         );
 }
 
-export default NewOrder;
+export default ClientRes;
 // if (document.getElementById("socket")) {
 //     ReactDOM.render(<NewOrder />, document.getElementById("socket"));
 // }

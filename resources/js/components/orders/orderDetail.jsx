@@ -9,61 +9,50 @@ class CustomerDetail extends Component {
         const { deliPrice } = order;
         return (
             <div>
-                <br />
+                <div>Your contact number: &nbsp;{order.contactPhone}</div>
 
-                <label>Your contact number: &nbsp;{order.contactPhone}</label>
+                <div> {order.isDeli ? "Delivery" : "Self Collection"}</div>
 
-                <br />
-                <label> {order.isDeli ? "Delivery" : "Self Collection"}</label>
-                <br />
                 {order.isDeli ? (
-                    order.isDeli && (
-                        <>
-                            <label>
-                                Delivery address: &nbsp;
-                                {order.deliAddr}
-                            </label>
-                            <br />
-                        </>
-                    )
-                ) : (
-                    <div> {""}</div>
-                )}
+                    <>
+                        <div>
+                            Delivery address: &nbsp;
+                            {order.deliAddr}
+                        </div>
+                    </>
+                ) : null}
                 {deliPrice == "max" && order.isDeli && (
-                    <label className="text-warning ">
+                    <div className="text-warning ">
                         Make sure the delivery address is agreed with the shop.
                         And the delivery price may vary.
-                        <br />
-                    </label>
+                    </div>
                 )}
 
-                {order.isDeli && order.addrError == "NOT_FOUND" && (
-                    <label className="text-danger">
+                {order.isDeli && order.addrError == "NOT_FOUND" ? (
+                    <div className="text-danger">
                         Make sure the address is deliverable. And the delivery
                         price may vary.
-                        <br />
-                    </label>
-                )}
+                    </div>
+                ) : null}
 
-                <label>
+                <div>
                     Pay method:&nbsp;{order.cardPay ? "By card" : "By cash"}
-                </label>
-                <br />
+                </div>
+
                 {order.cardPay ? (
-                    <label>
+                    <div>
                         Total paid amount : &nbsp;
                         {order.paidAmt}Eur
-                    </label>
+                    </div>
                 ) : (
-                    <label>
+                    <div>
                         Total amount to pay: &nbsp;
                         {order.amtToPay}Eur
-                    </label>
+                    </div>
                 )}
-                <br />
 
                 {order.order_msg && (
-                    <label>Message to shop: &nbsp;{order.order_msg}</label>
+                    <div>Message to shop: &nbsp;{order.order_msg}</div>
                 )}
                 <hr />
             </div>

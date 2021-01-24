@@ -60,10 +60,10 @@ export default function Modal(props) {
                     </label>
                 </div>
                 <br />
-                <div className="justify-content-center mb-2 row">
+                <div className="justify-content-center mb-2  row">
                     <button
                         onClick={props.closeModal}
-                        className="btn btn-secondary"
+                        className="btn btn-secondary "
                     >
                         Choose none
                     </button>

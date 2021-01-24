@@ -1,15 +1,14 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import axios from "axios";
-import formValidate from "../validation/formValidate";
-//import allValidateErrors from "./allValidateErrors";
+import allValidateErrors from "./allValidateErrors";
+
 
 export default class BankForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
             reged: true,
-            isValid: false,
             inputs: {
                 acName: "",
                 ownerName: "",
@@ -58,80 +57,76 @@ export default class BankForm extends Component {
         inputs[name] = value;
         this.setState({ inputs });
         const { errors } = this.state;
-        if (errors[name]) this.validateInput();
+        if (errors[name]) this.setError();
     };
 
-    // validateError = (input, value) => {
-    //     // let errors = this.state.errors;
+    validateError = (input, value) => {
+        // let errors = this.state.errors;
 
-    //     switch (input) {
-    //         case "acName":
-    //             if (value.length === 0)
-    //                 return "Name on the account can't be empty!";
-    //             if (value.length < 5)
-    //                 return "Name on the account must be less 5 characters!";
-    //             break;
-    //         case "ownerName":
-    //             if (value.length === 0) return "Owner's name  can't be empty!";
-    //             if (value.length < 5) return "Owner's name must be full name!";
-    //             break;
-    //         case "ownerPh":
-    //             if (value.length === 0)
-    //                 return "Owner's phone number is required!";
-    //             if (value.length < 10)
-    //                 return "Owner's phone number must be at leat 10 digits!";
-    //             break;
-    //         case "contactPh":
-    //             if (0 < value.length && value.length < 10)
-    //                 return "Contact phone number must be at leat 10 digits!";
-    //             break;
-    //         case "sortCode":
-    //             if (value.length === 0) return "Sort code is required!";
-    //             if (value.length < 6)
-    //                 return "Sort code  must be at leat 6 numbers!";
-    //             if (value.length > 8)
-    //                 return "Sort code  must be not more 8 numbers!";
+        switch (input) {
+            case "acName":
+                if (value.length === 0)
+                    return "Name on the account can't be empty!";
+                if (value.length < 5)
+                    return "Name on the account must be less 5 characters!";
+                break;
+            case "ownerName":
+                if (value.length === 0) return "Owner's name  can't be empty!";
+                if (value.length < 5) return "Owner's name must be full name!";
+                break;
+            case "ownerPh":
+                if (value.length === 0)
+                    return "Owner's phone number is required!";
+                if (value.length < 10)
+                    return "Owner's phone number must be at leat 10 digits!";
+                break;
+            case "contactPh":
+                if (0 < value.length && value.length < 10)
+                    return "Contact phone number must be at leat 10 digits!";
+                break;
+            case "sortCode":
+                if (value.length === 0) return "Sort code is required!";
+                if (value.length < 6)
+                    return "Sort code  must be at leat 6 numbers!";
+                if (value.length > 8)
+                    return "Sort code  must be not more 8 numbers!";
 
-    //             break;
-    //         case "account":
-    //             if (value.length === 0) return "Account number is required!";
-    //             if (value.length < 7)
-    //                 return "Account number  must be at leat 7 numbers!";
-    //             break;
-    //         case "iban":
-    //             if (value.length === 0) return "Iban is required!";
-    //             if (value.length < 7) return "Iban  must be at leat 7 numbers!";
-    //             break;
-    //         default:
-    //             return "";
-    //             break;
-    //     }
-
-    // this.setState({ errors, [name]: value }, () => {
-    // console.log(errors);
-    //});
-    // };
-
-    // setError = () => {
-    //     const { name, value } = event.target;
-    //     const error = this.validateError(name, value);
-
-    //     const errors = { ...this.state.errors };
-    //     // if (error) {
-    //     errors[name] = error;
-    //     this.setState({ errors });
-    //     // }
-    // };
-    validateInput = () => {
-        let errors = { ...this.state.errors };
-        if (!event.target.checkValidity()) {
-            errors[name] = event.target.validationMessage;
-            console.log("in blur");
-            this.setState({ errors });
-        } else {
-            errors[name] = "";
-            this.setState({ errors });
+                break;
+            case "account":
+                if (value.length === 0) return "Account number is required!";
+                if (value.length < 7)
+                    return "Account number  must be at leat 7 numbers!";
+                break;
+            case "iban":
+                if (value.length === 0) return "Iban is required!";
+                if (value.length < 7) return "Iban  must be at leat 7 numbers!";
+                break;
+            default:
+                return "";
+                break;
         }
+
+        // this.setState({ errors, [name]: value }, () => {
+        // console.log(errors);
+        //});
+    };
+
+    setError = () => {
+        const { name, value } = event.target;
+        const error = this.validateError(name, value);
+
+        const errors = { ...this.state.errors };
+        // if (error) {
+        errors[name] = error;
+        this.setState({ errors });
+        // }
+    };
+    handleBlur = () => {
+        this.setError();
+        const touched = { ...this.state.touched };
+
+        touched[event.target.name] = true;
+        this.setState({ touched });
     };
     onFileChange = event => {
         this.setState({
@@ -145,13 +140,21 @@ export default class BankForm extends Component {
             //loaded: 0
         });
     };
-
-    handleSubmit = async event => {
+    handleSubmit = event => {
         event.preventDefault();
-        let errors = formValidate();
-        if (errors) this.setState({ errors });
-        else {
-            //if (this.state.isValid) {
+
+        //setErrors(validate());
+        let validErrors = allValidateErrors(this.state.inputs);
+        let errors = { ...this.state.errors };
+        if (Object.keys(validErrors).length > 0) {
+            for (let key in validErrors) {
+                //console.log(key, inputs[key]);
+
+                errors[key] = validErrors[key];
+            }
+
+            this.setState({ errors });
+        } else {
             const data = new FormData();
 
             data.append("image", this.state.selectedFile);
@@ -175,32 +178,31 @@ export default class BankForm extends Component {
             //     }
             // };
             //console.log("dddd" + JSON.stringify(data));
-            try {
-                let res = await axios.post("api/bank/store", data, {});
-                if (res.status === 200 && res.data == "bank store success")
-                    window.location.replace("/dashBoard");
-            } catch (error) {
-                let errs = { ...this.state.errors };
-                let newErrors = error.response.data.errors;
 
-                console.log("errors" + JSON.stringify(error.response.data));
-                for (const key in newErrors) {
-                    errs[key] = newErrors[key][0];
-                }
-                this.setState({ errors: errs });
-            }
-            //////
-            // axios
-            //     .post("api/bank/store", data, {})
+            axios
+                .post("api/bank/store", data, {})
 
-            //     .then(res => {
-            //         // console.log("datadata" + data);
-
-            //         if (res.data == "bank store success")
-            //             window.location.replace("/dashBoard");
-            //     });
+                .then(res => {
+                    // then print response status
+                    // console.log("datadata" + data);
+                    // console.log(res);
+                    if (res.data == "bank store success")
+                        window.location.replace("/dashBoard");
+                });
         }
     };
+    // handleSubmit = event => {
+    //     event.preventDefault();
+
+    //     axios
+    //         .post("api/bank/store/", this.state.inputs)
+
+    //         .then(res => {
+    //             // then print response status
+    //             if (res.data == "bank store success")
+    //                 window.location.replace("/dashBoard");
+    //         });
+    // };
 
     render() {
         const { inputs, errors } = this.state;
@@ -217,21 +219,17 @@ export default class BankForm extends Component {
                     <h6 className="text-center">Bank Account Registration</h6>
                     <h6 className="text-center">登记表</h6>
                     <hr />
-                    <form noValidate onSubmit={this.handleSubmit}>
+                    <form onSubmit={this.handleSubmit}>
                         <div className="form-group">
                             <label className="control-label">
                                 Company Name for the Account:
                                 <input
                                     name="acName"
                                     type="text"
-                                    id="acName"
-                                    minLength={5}
-                                    maxLength={30}
                                     placeholder="company name"
                                     value={this.state.inputs.acName}
                                     onChange={this.handleChange}
-                                    onBlur={this.validateInput}
-                                    required
+                                    onBlur={this.handleBlur}
                                 />
                             </label>
                             {errors.acName && (
@@ -244,14 +242,10 @@ export default class BankForm extends Component {
                                 <input
                                     name="ownerName"
                                     type="text"
-                                    id="ownerName"
                                     placeholder="owner name"
                                     value={this.state.inputs.ownerName}
                                     onChange={this.handleChange}
-                                    onBlur={this.validateInput}
-                                    minLength={5}
-                                    maxLength={30}
-                                    required
+                                    onBlur={this.handleBlur}
                                 />
                             </label>
                             {errors.ownerName && (
@@ -265,13 +259,11 @@ export default class BankForm extends Component {
                                 Contact Phone Number:
                                 <input
                                     name="contactPh"
-                                    type="tel"
+                                    type="text"
                                     placeholder="contact phone number"
                                     value={this.state.inputs.contactPh}
                                     onChange={this.handleChange}
-                                    onBlur={this.validateInput}
-                                    minLength={10}
-                                    maxLength={30}
+                                    onBlur={this.handleBlur}
                                 />
                             </label>
                             {errors.contactPh && (
@@ -285,12 +277,11 @@ export default class BankForm extends Component {
                                 Owner's Phone Number:
                                 <input
                                     name="ownerPh"
-                                    type="tel"
+                                    type="text"
                                     placeholder="phone number"
                                     value={this.state.inputs.ownerPh}
                                     onChange={this.handleChange}
-                                    onBlur={this.validateInput}
-                                    required
+                                    onBlur={this.handleBlur}
                                 />
                             </label>
                             {errors.ownerPh && (
@@ -306,10 +297,7 @@ export default class BankForm extends Component {
                                     placeholder="sort code"
                                     value={inputs.sortCode}
                                     onChange={this.handleChange}
-                                    onBlur={this.validateInput}
-                                    minLength={6}
-                                    maxLength={8}
-                                    required
+                                    onBlur={this.handleBlur}
                                 />
                             </label>
                             {errors.sortCode && (
@@ -322,14 +310,10 @@ export default class BankForm extends Component {
                                 <input
                                     name="account"
                                     type="text"
-                                    pattern="\d*"
                                     placeholder="account"
                                     value={inputs.account}
                                     onChange={this.handleChange}
-                                    onBlur={this.validateInput}
-                                    minLength={8}
-                                    maxLength={30}
-                                    required
+                                    onBlur={this.handleBlur}
                                 />
                             </label>
                             {errors.account && (
@@ -345,10 +329,7 @@ export default class BankForm extends Component {
                                     placeholder="Iban"
                                     value={inputs.iban}
                                     onChange={this.handleChange}
-                                    onBlur={this.validateInput}
-                                    minLength={16}
-                                    maxLength={40}
-                                    required
+                                    onBlur={this.handleBlur}
                                 />
                             </label>
                             {errors.iban && (

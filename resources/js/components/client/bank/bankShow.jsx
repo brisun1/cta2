@@ -2,7 +2,7 @@ import React, { Component } from "react";
 
 import ReactDOM from "react-dom";
 
-//import { Link } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 class BankShow extends Component {
     constructor() {
         super();
@@ -11,18 +11,38 @@ class BankShow extends Component {
 
     componentDidMount() {
         axios.get("api/bank/show").then(res => {
-            if (res.data)
+            if (res.data != "no bank")
                 //console.log("in bankshow" + JSON.stringify(res.data));
                 this.setState({
                     bank: res.data
                 });
         });
     }
+    gotoRegisterBank = () => {
+        this.props.history.push("/createBank");
+    };
     render() {
         let { bank } = this.state;
         console.log("bank show  rendering" + JSON.stringify(bank));
         //console.log(this.props);
-        if (bank) {
+        if (Object.keys(bank).length === 0)
+            return (
+                <>
+                    <div className="text-warning">
+                        You don't have your bank account with us. Please
+                        register first!
+                    </div>
+                    <br />
+                    <button
+                        onClick={this.gotoRegisterBank}
+                        className="btn btn-primary"
+                    >
+                        Register Bank Account
+                    </button>
+                    <br />
+                </>
+            );
+        else {
             return (
                 <div>
                     <br />
@@ -86,7 +106,7 @@ class BankShow extends Component {
     }
 }
 
-export default BankShow;
+export default withRouter(BankShow);
 // if (document.getElementById("shopDetail")) {
 //     ReactDOM.render(<ShopDetail />, document.getElementById("shopDetail"));
 // }

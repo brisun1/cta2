@@ -41,11 +41,20 @@ class MenuOrder extends Component {
             modalOpen: false,
             //modalRadio: false,
             modalChecked: "",
+            errors: {
+                custPhone: "",
+                custAddr: "",
+                orderMobile: "",
+                orderMsg: "",
+                pwd: "",
+                tip: ""
+            },
+            phpErrors: {},
+            showOrderPhForm: false,
             dist: "",
             // CardPay: true,
             total: null,
             custData: {
-                deliPrice: null,
                 isDeli: true,
                 deliPrice: null,
                 custAddr: "",
@@ -54,6 +63,7 @@ class MenuOrder extends Component {
                 orderMsg: "",
                 addrError: "",
                 cardPay: true,
+                tip: null,
                 total: null,
                 orderTblString: orderTblString,
                 cashConfirm: false,
@@ -108,21 +118,49 @@ class MenuOrder extends Component {
     };
     getTotal = () => {
         const { menu } = this.state;
-        let total = menu.reduce((total, a) => {
-            return total + a.subTotal;
-        }, 0);
-        let { deliPrice } = this.state.custData;
-        if (deliPrice === "max") {
-            deliPrice = 2.5;
-        }
-
+        let total = menu
+            .filter(({ subTotal }) => subTotal !== null)
+            .reduce((total, a) => {
+                return total + a.subTotal;
+            }, 0);
+        //console.log("intotal menuorder" + total);
         if (total) {
             if (this.state.custData.isDeli) {
-                return total + Number(deliPrice);
-            } else {
-                return total;
+                const { deliPrice } = this.state.custData;
+                if (deliPrice) {
+                    if (deliPrice === "max") {
+                        deliPrice = 2.5;
+                    }
+                    total = total + Number(deliPrice);
+                }
+                //console.log("intotal menuorder" + total);
             }
+            return total;
         }
+    };
+    getTotal2 = () => {
+        const { menu } = this.state;
+        let total = menu
+            .filter(({ subTotal }) => subTotal !== null)
+            .reduce((total, a) => {
+                return total + a.subTotal;
+            }, 0);
+        let deliPrice = { ...this.state.custData.deliPrice };
+
+        if (deliPrice) {
+            if (deliPrice === "max") {
+                deliPrice = 2.5;
+            }
+            total += Number(deliPrice);
+        }
+        //const tip = { ...this.state.custData.tip };
+        // if (tip) {
+        //     total += Number(tip);
+        // }
+        // const custData = { ...this.state.custData };
+        // custData.total = total;
+        // this.setState({ custData });
+        return total;
     };
     // handleCustAddr = e => {
     //     this.setState({ custAddr: e.target.value });
@@ -227,18 +265,26 @@ class MenuOrder extends Component {
         btnClicked.push(t);
         this.setState({ custData: { ...this.state.custData, btnClicked } });
     };
+    //for order mobile form
+    handleOrderMobileChange = () => {
+        let custData = { ...this.state.custData };
+        custData.orderMobile = event.target.value;
+        this.setState({ custData });
+        const { errors } = this.state;
+        if (errors.orderMobile) this.validateInput();
+    };
     componentDidMount() {
         const { shop } = this.state;
         let str_tbl = shop.shopName + shop.area + shop.id;
         axios
             .all([
                 axios.get(`api/menu/show/${str_tbl}`, { baseURL: "/" }),
-                axios.get(`api/delivery/show/${shop.id}`, { baseURL: "/" })
+                axios.get(`api/delivery/custShow/${shop.id}`, { baseURL: "/" })
             ])
             .then(
                 axios.spread((...res) => {
                     let sData = res[0].data;
-                    console.log("whyresgggggg" + JSON.stringify(res[0].data));
+                    //console.log("whyresgggggg" + JSON.stringify(res[0].data));
                     if (sData.length != 0) {
                         let menu = sData.data;
                         let cats = [];
@@ -267,13 +313,13 @@ class MenuOrder extends Component {
                     ///Delivery
                     let dData = res[1].data;
                     // console.log(
-                    //     "whyresggggggdelivery" + JSON.stringify(res.data)
+                    //     "whyresggggggdelivery" + JSON.stringify(res[1])
                     // );
                     this.setState({ delivery: dData });
                 })
             );
     }
-    handleSubmitFoodForm = e => {
+    handleSubmitFoodForm = async e => {
         e.preventDefault();
         const checkMenu = [];
         this.state.menu.forEach(el => {
@@ -281,38 +327,107 @@ class MenuOrder extends Component {
                 checkMenu.push(el);
             }
         });
-        axios
-            .post(
+
+        try {
+            let res = await axios.post(
                 "api/order/storeFood/" + this.state.custData.orderTblString,
                 checkMenu,
                 { baseURL: "/" }
-            )
+            );
+            if (res.status === 200 && res.data == "storeFood success")
+                this.setState({
+                    custData: { ...this.state.custData, foodSubmited: true }
+                });
+            if (!this.state.custData.cardPay)
+                this.setState({ showOrderPhForm: true });
+        } catch (error) {
+            let errs = { ...this.state.phpErrors };
+            let newErrors = error.response.data.errors;
 
-            .then(res => {
-                // console.log("food submit" + JSON.stringify(checkMenu));
-                // console.log("food submit" + JSON.stringify(res));
-                if (res.data === "storeFood success") {
-                    this.setState({
-                        custData: { ...this.state.custData, foodSubmited: true }
-                    });
-                    //this.handleNextStep();
-                    //this.props.handleNextStep();
-                }
-            });
+            for (const key in newErrors) {
+                errs[key] = newErrors[key][0];
+            }
+            console.log("in orderMenu errors" + JSON.stringify(errs));
+            this.setState({ phpErrors: errs });
+        }
+
+        // axios
+        //     .post(
+        //         "api/order/storeFood/" + this.state.custData.orderTblString,
+        //         checkMenu,
+        //         { baseURL: "/" }
+        //     )
+
+        //     .then(res => {
+
+        //         if (res.data === "storeFood success") {
+        //             this.setState({
+        //                 custData: { ...this.state.custData, foodSubmited: true }
+        //             });
+
+        //         }
+        //     });
     };
+
     handleCustAddr = e => {
         const custData = { ...this.state.custData };
         custData.custAddr = e.target.value;
         this.setState({ custData });
 
+        const { errors } = this.state;
+        if (errors.custAddr) this.validateInput();
+        // if (this.state.custData.addrError) {
+        //     let custData = { ...this.state.custData };
+        //     custData.addrError = "";
+        //     this.setState({ custData });
+        // }
         setTimeout(() => {
             this.getDist();
         }, 2500);
+    };
+    handleInputErrors = errors => {
+        this.setState({ errors });
     };
     handlePhone = e => {
         this.setState({
             custData: { ...this.state.custData, custPhone: e.target.value }
         });
+        const { errors } = this.state;
+        if (errors.custPhone) this.validateInput();
+        //this.setState({errors});
+    };
+    validateInput = () => {
+        const { name } = event.target;
+        let errors = { ...this.state.errors };
+        if (!event.target.checkValidity()) {
+            errors[name] = event.target.validationMessage;
+            //console.log("in blur");
+            this.setState({ errors });
+        } else {
+            errors[name] = "";
+            this.setState({ errors });
+        }
+    };
+    validateAddr = () => {
+        this.getDist();
+
+        this.validateInput();
+    };
+    addDeliPriceToTotal = () => {
+        let total = { ...this.state.custData.total };
+
+        let deliPrice = { ...this.state.custData.deliPrice };
+
+        if (deliPrice) {
+            if (deliPrice === "max") {
+                deliPrice = 2.5;
+            }
+            total += Number(deliPrice);
+        }
+
+        const custData = { ...this.state.custData };
+        custData.total = total;
+        this.setState({ custData });
     };
     handleOrderMobile = e => {
         this.setState({
@@ -357,8 +472,10 @@ class MenuOrder extends Component {
                         custData.deliPrice = 2.5;
                         this.setState({ custData });
                     } else if (status == "OK") {
+                        //console.log("in dist" + this.state.custData.addrError);
                         custData.addrError = "";
                         this.setState({ custData });
+
                         const dist = response.rows[0].elements[0].distance.text;
                         if (dist) {
                             this.getDeliPrice(dist);
@@ -380,6 +497,8 @@ class MenuOrder extends Component {
         const deli = this.state.delivery;
         if (dist > this.state.delivery.servLimit) {
             deliPrice = "max";
+        } else if (dist > 4) {
+            deliPrice = deli.dist5;
         } else if (dist > 3) {
             deliPrice = deli.dist4;
         } else if (dist > 2.5) {
@@ -436,9 +555,8 @@ class MenuOrder extends Component {
 
             .then(res => {
                 // then print response status
-                console.log("update responnn" + res.data);
+                // console.log("update responnn" + res.data);
                 if (res.data == "order update success") {
-                    console.log(res.statusText);
                 }
             });
     };
@@ -522,6 +640,15 @@ class MenuOrder extends Component {
                             custUpdate={this.custUpdate}
                             handleSubmitFoodForm={this.handleSubmitFoodForm}
                             handleBtnClicked={this.handleBtnClicked}
+                            errors={this.state.errors}
+                            phpErrors={this.state.phpErrors}
+                            showOrderPhForm={this.state.showOrderPhForm}
+                            handleOrderMobileChange={
+                                this.handleOrderMobileChange
+                            }
+                            validateInput={this.validateInput}
+                            validateAddr={this.validateAddr}
+                            handleInputErrors={this.handleInputErrors}
                         />
                     </div>
                 )}
@@ -547,10 +674,12 @@ class MenuOrder extends Component {
                                 deliPrice={this.state.custData.deliPrice}
                                 //getDist={this.getDist}
                                 getTotal={this.getTotal}
+                                //total={this.state.custData.total}
                                 orderTblString={
                                     this.state.custData.orderTblString
                                 }
-                                // isDeli={this.state.isDeli}
+                                validateInput={this.validateInput}
+                                tipError={this.state.errors.tip} // isDeli={this.state.isDeli}
                                 // handleDeliCheck={this.handleDeliCheck}
                                 // getDeliPrice={this.getDeliPrice}
                                 // handlePayMethod={this.handlePayMethod}
@@ -564,6 +693,8 @@ class MenuOrder extends Component {
                             handleSubmitFoodForm={this.handleSubmitFoodForm}
                             custData={custData}
                             getTotal={this.getTotal}
+                            validateInput={this.validateInput}
+                            pwdError={this.state.errors.pwd}
                         />
                     ))}
                 {step === 4 && (

@@ -39,6 +39,19 @@ class BankController extends Controller
      */
     public function store(Request $request)
     {
+        
+        $this->validate($request, [
+            'acName' => 'required|string|min:5|max:30',
+            
+            'ownerName' => 'required|string|min:5|max:30',
+            //'tel' => 'required|string|max:40',
+            'ownerPh' => 'required|string|min:10|max:40',
+            'contactPh' => 'required|string|min:10|max:40',
+            'sortCode'=>'required|string|min:6|max:8',
+            'account'=>'required|numeric|digits_between:8,20',
+            'licenseFile'=>'required|image|mimes:jpeg,jpg,bmp,png,pdf|max:10240',
+            'statemtFile'=>'required|image|mimes:jpeg,jpg,bmp,png,pdf|max:10240',
+            ]);
         $bank=new Bank;
         if (Auth::check()) {
             if(!Auth::user()->bank){
@@ -128,9 +141,10 @@ if($request->hasFile('statemtFile')){
     {
         if(Auth::check()){
             $id=Auth::id();
-        $data=User::find($id)->bank;
-        
-        return new BankResource($data);
+            $data=User::find($id)->bank;
+            if($data)
+                return new BankResource($data);
+            else return "no bank";
     }
     }
     /**
@@ -152,9 +166,18 @@ if($request->hasFile('statemtFile')){
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request)
-    {
+    {$this->validate($request, [
+        'ac_name' => 'required|string|min:5|max:30',
         
-           
+        'owner_name' => 'required|string|min:5|max:30',
+        //'tel' => 'required|string|max:40',
+        'ownerPh' => 'required|string|min:10|max:40',
+        'contactPh' => 'required|string|min:10|max:40',
+        'sort_code'=>'required|string|min:6|max:8',
+        'account'=>'required|numeric|digits_between:8,20',
+        'licenseFile'=>'required|image|mimes:jpeg,jpg,bmp,png,pdf|max:10240',
+        'statemtFile'=>'required|image|mimes:jpeg,jpg,bmp,png,pdf|max:10240',
+            ]); 
             if (Auth::check()) {
                 $bank=Auth::user()->bank;
             $bank->user_id=Auth::id();
@@ -180,7 +203,7 @@ if($request->hasFile('statemtFile')){
             
                 $licenseNameToStore= $filename.'_'.time().'.'.$extension;
                 
-                Image::make($photo)->resize(null,200)->save(public_path('storage/bank_img/'.$fileNameToStore));                
+                Image::make($photo)->resize(null,200)->save(public_path('storage/bank_img/'.$licenseNameToStore));                
                
                 $bank->license=$licenseNameToStore;
             
@@ -203,7 +226,7 @@ if($request->hasFile('statemtFile')){
     
         $statemtNameToStore= $filename.'_'.time().'.'.$extension;
         
-        Image::make($photo)->resize(null,200)->save(public_path('storage/bank_img/'.$fileNameToStore));                
+        Image::make($photo)->resize(null,200)->save(public_path('storage/bank_img/'.$statemtNameToStore));                
        
         $bank->statemt=$statemtNameToStore;
     

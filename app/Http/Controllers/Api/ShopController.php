@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Api;
-
+use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Resources\Shop as ShopResource;
@@ -56,10 +56,34 @@ class ShopController extends Controller
     
     public function store(Request $request)
     {
+       
+        $this->validate($request, [
+            'shopName' => 'required|string|min:2|max:30',
+            'area' => 'bail|required|string|min:2|max:20',
+            'addr' => 'required|string|min:5|max:60',
+            'ownerName' => 'required|string|min:5|max:30',
+            //'tel' => 'required|string|max:40',
+            'ownerMobl' => 'required|string|min:10|max:40',
+            'phone' => 'required|string|min:10|max:40',
+            'cterMobl' => 'required|string|min:10|max:40',
+            'orderMobl' => 'string|max:40|nullable',
+            'weekOpen'=>'required|date_format:H:i',
+            'weekClose'=>'required|date_format:H:i',
+            'friOpen'=>'required|date_format:H:i',
+            'friClose'=>'required|date_format:H:i',
+            'satOpen'=>'required|date_format:H:i',
+            'satClose'=>'required|date_format:H:i',
+            'sunOpen'=>'required|date_format:H:i',
+            'sunClose'=>'required|date_format:H:i',
+            'promTxt1'=>'string|max:120|nullable',
+            'promTxt2'=>'string|max:120|nullable',
+            'promTxt3'=>'string|max:120|nullable',
+            'promPic'=>'image|mimes:jpeg,jpg,bmp,png,pdf|max:15000|nullable',
+            'promPic2'=>'image|mimes:jpeg,jpg,bmp,png,pdf|max:10240|nullable',
+            'promPic3'=>'image|mimes:jpeg,jpg,bmp,png,pdf|max:10240|nullable',
+            ]);
         $shop=new Shop;
        
-        //$shop->user_id=Auth::id();auth('api')->user()
-        //return "auth uer id ".Auth::id()."tttttttt";
         $shopName=$request->get('shopName');
         $area=$request->get('area');
         $shop->user_id=Auth::id();
@@ -204,6 +228,7 @@ class ShopController extends Controller
             $sarea=$shop->area;
             $tbl_name='menu_'.$sname.$sarea.$sid;
             //check if menu is set
+            
             $menu=new Menu();
             $menu->setTable($tbl_name);
             $noMenu="";
@@ -251,7 +276,42 @@ class ShopController extends Controller
      */
     public function update(Request $request)
     {
-        // $this->validate($request, [
+    //     Validator::make($request->all(), [
+    //         'friOpen' => 'required|date_format:H:i',
+    //     'friClose' => 'required|date_format:H:i',
+    //     //'body' => 'required',
+    // ])->validate();
+
+         $this->validate($request, [
+            'shopName' => 'required|string|min:2|max:30',
+            'area' => 'bail|required|string|min:2|max:20',
+            'addr' => 'required|string|min:5|max:60',
+            'ownerName' => 'required|string|min:5|max:30',
+            //'tel' => 'required|string|max:40',
+            'ownerMobl' => 'required|string|min:10|max:40',
+            'phone' => 'required|string|min:10|max:40',
+            'cterMobl' => 'required|string|min:10|max:40',
+            'orderMobl' => 'string|max:40|nullable',
+            'weekOpen'=>'required|date_format:H:i',
+            'weekClose'=>'required|date_format:H:i',
+            'friOpen'=>'required|date_format:H:i',
+            'friClose'=>'required|date_format:H:i',
+            'satOpen'=>'required|date_format:H:i',
+            'satClose'=>'required|date_format:H:i',
+            'sunOpen'=>'required|date_format:H:i',
+            'sunClose'=>'required|date_format:H:i',
+            'promTxt1'=>'string|max:120|nullable',
+            'promTxt2'=>'string|max:120|nullable',
+            'promTxt3'=>'string|max:120|nullable',
+            'promPic'=>'image|mimes:jpeg,jpg,bmp,png,pdf|max:15000|nullable',
+            'promPic2'=>'image|mimes:jpeg,jpg,bmp,png,pdf|max:10240|nullable',
+            'promPic3'=>'image|mimes:jpeg,jpg,bmp,png,pdf|max:10240|nullable',
+            ]);
+           // return Validator::make($data, [ 'appointment_date' => 'required|date_format:d-m-Y', 'from_time' => 'required|date_format:H:i', 'to_time' => 'required|date_format:H:i', ]);
+           //weekClose,friOpen,friClose,satOpen,
+        // satClose,sunOpen,sunClose,promTxt1,promTxt2,promTxt3
+        // promPic,promPic2,promPic3
+            // $this->validate($request, [
         //     'uname' => 'required|string|max:30',
         //     'city' => 'required|string|max:30',
         //     'tel' => 'required|string|max:40',
@@ -287,7 +347,7 @@ class ShopController extends Controller
         //     'img8'=>'image|mimes:jpeg,bmp,png|size:10000|nullable',
         //     'img9'=>'image|mimes:jpeg,bmp,png|size:10000|nullable'
         // ]);
-        ////
+        
         
         $id=$request->get('id');
         

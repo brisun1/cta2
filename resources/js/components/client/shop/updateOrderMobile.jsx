@@ -1,16 +1,17 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import axios from "axios";
-import {
-    BrowserRouter as Router,
-    Switch,
-    Route,
-    Link,
-    NavLink,
-    Redirect
-    //useRouteMatch
-} from "react-router-dom";
-import { isEmpty } from "lodash";
+import formValidate from "../validation/formValidate";
+// import {
+//     BrowserRouter as Router,
+//     Switch,
+//     Route,
+//     Link,
+//     NavLink,
+//     Redirect
+//     //useRouteMatch
+// } from "react-router-dom";
+
 class UpdateOrderMobile extends Component {
     constructor(props) {
         super(props);
@@ -24,61 +25,63 @@ class UpdateOrderMobile extends Component {
         };
     }
     componentDidMount() {
-        console.log("default" + this.props.shop);
-        // let inputs = {};
-        // inputs.orderMobl = this.props.shop.orderMobl;
-        // inputs.promTxt1 = this.props.shop.promTxt1;
-        // inputs.promTxt2 = this.props.shop.promTxt2;
-        // inputs.promTxt3 = this.props.shop.promTxt3;
-        // inputs.offer = "";
+        // console.log("default" + this.props.shop);
+
         this.setState({ orderMobl: this.props.orderMobl });
     }
     handleChange = event => {
-        // const { name, value } = event.target;
-        // var inputs = { ...this.state.inputs };
-        // inputs[name] = value;
-
+        let { errors } = this.state;
         this.setState({ orderMobl: event.target.value });
+        if (errors[event.target.name]) this.validateInput();
     };
-    // handleOfferChange = event => {
-    //     this.setState({ offer: event.target.value });
-    // };
-
+    validateInput = () => {
+        const { name } = event.target;
+        let errors = { ...this.state.errors };
+        if (!event.target.checkValidity()) {
+            errors[name] = event.target.validationMessage;
+            //console.log("in blur");
+            this.setState({ errors });
+        } else {
+            errors[name] = "";
+            this.setState({ errors });
+        }
+    };
     handleOrderMobileSubmit = event => {
         event.preventDefault();
+        let errors = formValidate();
+        //console.log("err" + errors);
+        if (errors) this.setState({ errors });
+        else {
+            //setErrors(validate());
+            //axios.post("api/clientForm", this.state).then(response => {});
+            // const data = new FormData();
+            // for (var x = 0; x < this.state.selectedFile.length; x++) {
+            //     data.append("image", this.state.selectedFile[x]);
+            // }
+            // data.append("image", this.state.selectedFile);
+            let data = {
+                id: this.props.id,
+                orderMobl: this.state.orderMobl
+            };
+            axios
+                .post("api/shop/minorUpdate", data, {
+                    params: {
+                        _method: "PUT"
+                    }
+                })
 
-        //setErrors(validate());
-        //axios.post("api/clientForm", this.state).then(response => {});
-        // const data = new FormData();
-        // for (var x = 0; x < this.state.selectedFile.length; x++) {
-        //     data.append("image", this.state.selectedFile[x]);
-        // }
-        // data.append("image", this.state.selectedFile);
-        let data = {
-            id: this.props.id,
-            orderMobl: this.state.orderMobl
-        };
-        axios
-            .post("api/shop/minorUpdate", data, {
-                params: {
-                    _method: "PUT"
-                }
-            })
-
-            .then(res => {
-                console.log("res" + JSON.stringify(res));
-                if (res.data == "shop minorUpdate success") {
-                    window.location.replace("/dashBoard");
-                }
-            });
+                .then(res => {
+                    //console.log("res" + JSON.stringify(res));
+                    if (res.data == "shop minorUpdate success") {
+                        window.location.replace("/dashBoard");
+                    }
+                });
+        }
     };
 
     render() {
-        const { errors, inputs } = this.state;
-        //const { shop } = this.props;
-        // const inputs = this.props.shop;
-        //console.log("indefault" + JSON.stringify(this.props.shop));
-        //if (isEmpty) {
+        const { errors, orderMobl } = this.state;
+
         return (
             <div>
                 <div style={{ backgroundColor: "#f2f1eb" }}>
@@ -86,6 +89,7 @@ class UpdateOrderMobile extends Component {
 
                     <h6>Update the order mobile:</h6>
                     <form
+                        noValidate
                         id="orderMobileForm"
                         onSubmit={this.handleOrderMobileSubmit}
                         className="form-horizontal"
@@ -95,9 +99,13 @@ class UpdateOrderMobile extends Component {
                                 Mobile number:
                                 <input
                                     name="orderMobl"
-                                    type="text"
-                                    value={this.state.orderMobl}
+                                    type="tel"
+                                    value={orderMobl}
                                     onChange={this.handleChange}
+                                    onBlur={this.validateInput}
+                                    minLength={10}
+                                    maxLength={30}
+                                    required
                                 />
                             </label>
 
@@ -117,8 +125,6 @@ class UpdateOrderMobile extends Component {
                 </div>
             </div>
         );
-        //} else return "" + JSON.stringify(this.state.inputs);
-        //+ JSON.stringify(this.props.shop.img);
     }
 }
 

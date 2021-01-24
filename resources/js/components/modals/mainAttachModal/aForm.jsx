@@ -54,7 +54,7 @@ export const AForm = ({ confirmSelect, frPrice, modalOpen, closeModal }) => {
                 </label>
             </div>
             <br />
-            <div className="mb-2 row">
+            <div className="mb-2 ml-2 row">
                 <button
                     onClick={closeModal}
                     className=" btn btn-secondary"

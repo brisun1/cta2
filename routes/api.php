@@ -34,10 +34,12 @@ Route::post('order/store/{str_tbl}','Api\OrderController@store');
 Route::post('order/storeFood/{str_tbl}','Api\OrderController@storeFood');
 Route::put('order/update/{str_tbl}','Api\OrderController@update');
 Route::put('order/clientUpdate/{tblName}','Api\OrderController@clientUpdate');
+Route::put('order/clientUpdate2/{tblName}','Api\OrderController@clientUpdate2');
 Route::get('order/custShow/{str_tbl}','Api\OrderController@custShow');
 Route::post('order/matchPwd/{str_tbl}','Api\OrderController@matchPwd');
 Route::post('delivery/store/{str_tbl}','Api\DeliveryController@store')->middleware('auth:api');
 Route::get('delivery/show','Api\DeliveryController@show')->middleware('auth:api');
+Route::get('delivery/custShow/{shopId}','Api\DeliveryController@custShow');
 Route::put('delivery/update','Api\DeliveryController@update')->middleware('auth:api');
 //stripe
 Route::get('stripe/intent/{orderTblString}','Api\StripeController@create_pay_intent');

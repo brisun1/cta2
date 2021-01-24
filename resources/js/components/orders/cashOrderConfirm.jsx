@@ -4,34 +4,34 @@ class CashOrderConfirm extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            phonePwd: null
+            phonePwd: null,
+            phpError: ""
         };
     }
     handlePhonePwdChange = e => {
         this.setState({ phonePwd: e.target.value });
     };
-    handleSubmitPwd = e => {
+    handleSubmitPwd = async e => {
         e.preventDefault(e);
         //this.props.handleSubmitFoodForm(e);
         let data = { phonePwd: this.state.phonePwd };
-        axios
-            .post(
+        try {
+            let res = await axios.post(
                 "api/order/matchPwd/" + this.props.custData.orderTblString,
                 data,
                 {
                     baseURL: "/"
                 }
-            )
-            .then(res => {
-                //console.log("pwddddddddd" + JSON.stringify(res));
-                if (res.data == "pwd matched") {
-                    //
-                    // if (this.props.custData.foodSubmited == true) {
-                    this.props.handleNextStep();
-                    // this.props.handleNextStep();
-                    // }
-                }
-            });
+            );
+            if (res.status === 200 && res.data == "pwd matched")
+                this.props.handleNextStep();
+        } catch (error) {
+            let phpError = { ...this.state.phpError };
+            let newErrors = error.response.data.errors;
+
+            phpError = newErrors["phonePwd"][0];
+            this.setState({ phpError });
+        }
     };
 
     render() {
@@ -47,16 +47,24 @@ class CashOrderConfirm extends Component {
                 </button>
                 <h5 className="text-center">Order Confirmation</h5>
                 <hr />
-                <form onSubmit={this.handleSubmitPwd}>
+                <form noValidate onSubmit={this.handleSubmitPwd}>
                     <label htmlFor="pwd" className="">
                         Confirmation Code:
                     </label>
                     <input
                         className="ml-1"
                         id="pwd"
+                        name="pwd"
+                        type="text"
                         size={12}
                         onChange={this.handlePhonePwdChange}
+                        onBlur={this.props.validateInput}
+                        pattern=".{5,}"
+                        // minLength={5}
+                        // maxLength={5}
+                        required
                     />
+
                     <button
                         type="submit"
                         //onClick={this.handleSubmitPwd}
@@ -64,6 +72,10 @@ class CashOrderConfirm extends Component {
                     >
                         Confirm
                     </button>
+                    {this.state.phpError && (
+                        <div className="text-danger">{this.state.phpError}</div>
+                    )}
+                    <div className="text-danger">{this.props.pwdError}</div>
                 </form>
                 <hr />
                 <CustomerDetail

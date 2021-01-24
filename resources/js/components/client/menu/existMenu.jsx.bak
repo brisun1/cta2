@@ -439,6 +439,7 @@ class ExistMenu extends Component {
                             onChange={e => this.props.handleCustAddr(e)}
                         /> */}
                     </div>
+
                     {!this.props.menu.find(el => el.orderQty > 0) ? null : (
                         <button
                             onClick={this.props.handleNextStep}

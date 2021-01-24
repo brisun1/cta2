@@ -30,7 +30,7 @@ class CreateTbl extends Model
                     Schema::create($tbl_name, function($table)
                     {
                         $table->id();
-                        $table->string('fid');
+                        $table->string('fid')->nullable();
                         $table->string('fname');
                         $table->unsignedDecimal('price', 5, 2);
                         $table->string('cat',20);

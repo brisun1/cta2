@@ -1,0 +1,60 @@
+export default function allValidateErrors(inputs) {
+    let errors = {};
+    for (let key in inputs) {
+        //console.log(key, inputs[key]);
+        const value = inputs[key];
+        switch (key) {
+            case "acName":
+                if (value.length === 0)
+                    errors[key] = "Name on the account can't be empty!";
+                if (0 < value.length && value.length < 5)
+                    errors[key] =
+                        "Name on the account must be less 5 characters!";
+                break;
+            case "ownerName":
+                if (value.length === 0)
+                    errors[key] = "Owner's name  can't be empty!";
+                if (0 < value.length && value.length < 5)
+                    errors[key] = "Owner's name must be full name!";
+                break;
+            case "ownerPh":
+                if (value.length === 0)
+                    errors[key] = "Owner's phone number is required!";
+                if (0 < value.length && value.length < 10)
+                    errors[key] =
+                        "Owner's phone number must be at leat 10 digits!";
+                break;
+            case "contactPh":
+                if (0 < value.length && value.length < 10)
+                    errors[key] =
+                        "Contact phone number must be at leat 10 digits!";
+                break;
+            case "sortCode":
+                if (value.length === 0) errors[key] = "Sort code is required!";
+                if (0 < value.length && value.length < 6)
+                    errors[key] = "Sort code  must be at leat 6 numbers!";
+                if (value.length > 8)
+                    errors[key] = "Sort code  must be not more than 8 numbers!";
+                break;
+            case "account":
+                if (value.length === 0)
+                    errors[key] = "Account number is required!";
+                if (0 < value.length && value.length && value.length < 7)
+                    errors[key] = "Account number  must be at leat 7 numbers!";
+                break;
+            case "iban":
+                if (value.length === 0) errors[key] = "Iban is required!";
+                if (0 < value.length && value.length < 7)
+                    errors[key] = "Iban  must be at leat 7 numbers!";
+                break;
+            default:
+                errors[key] = "";
+                break;
+        }
+
+        // this.setState({ errors, [name]: value }, () => {
+        // console.log(errors);
+        //});
+    }
+    return errors;
+}

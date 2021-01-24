@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import axios from "axios";
+import formValidate from "../validation/formValidate";
 //import { useFormik } from "formik";
 
 export default class CreateShop extends Component {
@@ -69,111 +70,9 @@ export default class CreateShop extends Component {
         inputs[name] = value;
 
         this.setState({ inputs });
-
-        let errors = this.state.errors;
-
-        switch (name) {
-            case "shopName":
-                errors.shopName =
-                    value.length < 5
-                        ? "Full Name must be 5 characters long!"
-                        : "";
-                break;
-            case "addr":
-                errors.addr =
-                    value.length < 5
-                        ? "Address must be 5 characters long!"
-                        : "";
-                break;
-            case "area":
-                errors.area =
-                    value.length < 5 ? "Area must be 5 characters long!" : "";
-                break;
-            case "phone":
-                errors.phone =
-                    value.length < 5 ? "phone must be 5 characters long!" : "";
-                break;
-            case "ownerName":
-                errors.ownerName =
-                    value.length < 5
-                        ? "ownerName must be 5 characters long!"
-                        : "";
-                break;
-            case "ownerMobl":
-                errors.ownerMobl =
-                    value.length < 5
-                        ? "ownerMobl must be 5 characters long!"
-                        : "";
-                break;
-            case "cterMobl":
-                errors.cterMobl =
-                    value.length < 5
-                        ? " counter Mobl must be 5 characters long!"
-                        : "";
-                break;
-            case "orderMobl":
-                errors.orderMobl =
-                    value.length < 5
-                        ? "orderMobl must be 5 characters long!"
-                        : "";
-                break;
-
-            case "weekOpen":
-                errors.weekOpen =
-                    value.length < 2
-                        ? "Open at must be 2 characters long!"
-                        : "";
-                break;
-            case "weekClose":
-                errors.weekClose =
-                    value.length < 2
-                        ? "closeAt must be 2 characters long!"
-                        : "";
-                break;
-            case "friOpen":
-                errors.friOpen =
-                    value.length < 2
-                        ? "Open at must be 2 characters long!"
-                        : "";
-                break;
-            case "friClose":
-                errors.friClose =
-                    value.length < 2
-                        ? "closeAt must be 2 characters long!"
-                        : "";
-                break;
-            case "satOpen":
-                errors.satOpen =
-                    value.length < 2
-                        ? "Open at must be 2 characters long!"
-                        : "";
-                break;
-            case "satClose":
-                errors.satClose =
-                    value.length < 2
-                        ? "closeAt must be 2 characters long!"
-                        : "";
-                break;
-            case "sunOpen":
-                errors.sunOpen =
-                    value.length < 2
-                        ? "Open at must be 2 characters long!"
-                        : "";
-                break;
-            case "sunClose":
-                errors.sunClose =
-                    value.length < 2
-                        ? "closeAt must be 2 characters long!"
-                        : "";
-                break;
-
-            default:
-                break;
-        }
-
-        this.setState({ errors, [name]: value }, () => {
-            console.log(errors);
-        });
+        const { errors } = this.state;
+        if (errors[name]) this.validateInput();
+        //this.setState({errors});
     };
     onFileChange = event => {
         this.setState({
@@ -201,45 +100,80 @@ export default class CreateShop extends Component {
         });
     };
 
-    handleSubmit = event => {
-        event.preventDefault();
-
-        //setErrors(validate());
-        //axios.post("api/clientForm", this.state).then(response => {});
-        const data = new FormData();
-        // for (var x = 0; x < this.state.selectedFile.length; x++) {
-        //     data.append("image", this.state.selectedFile[x]);
-        // }
-        data.append("image", this.state.selectedFile);
-        if (this.state.promPic) data.append("promPic", this.state.promPic);
-        if (this.state.promPic2) data.append("promPic2", this.state.promPic2);
-        if (this.state.promPic3) data.append("promPic3", this.state.promPic3);
-        //data.append("image1", this.state.selectedFiles);
-        // for (let [key, value] of Object.entries(this.state.ninput)) {
-        //     data.set("${key}", "${value}");
-        // }
-        const o = Object.keys(this.state.inputs);
-        for (let i = 0; i <= o.length - 1; i++) {
-            data.set(o[i], this.state.inputs[o[i]]);
+    validateInput = () => {
+        const { name } = event.target;
+        let errors = { ...this.state.errors };
+        if (!event.target.checkValidity()) {
+            errors[name] = event.target.validationMessage;
+            //console.log("in blur");
+            this.setState({ errors });
+        } else {
+            errors[name] = "";
+            this.setState({ errors });
         }
+    };
+    handleSubmit = async event => {
+        event.preventDefault();
+        let errors = formValidate();
+        if (errors) this.setState({ errors });
+        else {
+            //setErrors(validate());
+            //axios.post("api/clientForm", this.state).then(response => {});
+            const data = new FormData();
+            // for (var x = 0; x < this.state.selectedFile.length; x++) {
+            //     data.append("image", this.state.selectedFile[x]);
+            // }
+            data.append("image", this.state.selectedFile);
+            if (this.state.promPic) data.append("promPic", this.state.promPic);
+            if (this.state.promPic2)
+                data.append("promPic2", this.state.promPic2);
+            if (this.state.promPic3)
+                data.append("promPic3", this.state.promPic3);
+            //data.append("image1", this.state.selectedFiles);
+            // for (let [key, value] of Object.entries(this.state.ninput)) {
+            //     data.set("${key}", "${value}");
+            // }
+            const o = Object.keys(this.state.inputs);
+            for (let i = 0; i <= o.length - 1; i++) {
+                data.set(o[i], this.state.inputs[o[i]]);
+            }
 
-        // const config = {
-        //     headers: {
-        //         "content-type": "application/x-www-form-urlencoded"
-        //     }
-        // };
-        console.log("dddd" + JSON.stringify(data));
-
-        axios
-            .post("api/shop/store", data, {})
-
-            .then(res => {
-                // then print response status
-                console.log("datadata" + data);
-                console.log(res);
-                if (res.data == "shop success")
+            // const config = {
+            //     headers: {
+            //         "content-type": "application/x-www-form-urlencoded"
+            //     }
+            // };
+            //console.log("dddd" + JSON.stringify(data));
+            ////
+            try {
+                let res = await axios.post("api/shop/store", data, {});
+                if (res.status === 200 && res.data == "shop success")
                     window.location.replace("/dashBoard");
-            });
+            } catch (error) {
+                let errs = { ...this.state.errors };
+                let newErrors = error.response.data.errors;
+
+                console.log("errors" + JSON.stringify(error.response.data));
+                for (const key in newErrors) {
+                    errs[key] = newErrors[key][0];
+                }
+                this.setState({ errors: errs });
+            }
+            ////
+            // axios
+            //     .post("api/shop/store", data, {})
+
+            //     .then(res => {
+            //         if (res.status === 422) {
+            //             //console.log("errordata" + data);
+            //         }
+            //         // then print response status
+            //         //console.log("datadata" + data);
+            //         //console.log(res);
+            //         if (res.status === 200 && res.data == "shop success")
+            //              window.location.replace("/dashBoard");
+            //     });
+        }
     };
 
     render() {
@@ -250,7 +184,11 @@ export default class CreateShop extends Component {
                 <br />
                 <h5 className="text-center">Shop Registration Form</h5>
                 <hr />
-                <form onSubmit={this.handleSubmit} className="form-horizontal">
+                <form
+                    noValidate
+                    onSubmit={this.handleSubmit}
+                    className="form-horizontal"
+                >
                     <div className="form-group">
                         <label className="control-label">
                             Shop name:
@@ -259,6 +197,10 @@ export default class CreateShop extends Component {
                                 type="text"
                                 value={inputs.shopName}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                minLength={2}
+                                maxLength={30}
+                                required
                             />
                         </label>
 
@@ -275,6 +217,10 @@ export default class CreateShop extends Component {
                                 type="text"
                                 value={inputs.addr}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                minLength={5}
+                                maxLength={60}
+                                required
                             />
                         </label>
 
@@ -290,6 +236,10 @@ export default class CreateShop extends Component {
                                 type="text"
                                 value={inputs.area}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                minLength={2}
+                                maxLength={30}
+                                required
                             />
                         </label>
 
@@ -302,9 +252,13 @@ export default class CreateShop extends Component {
                             Shop phone:
                             <input
                                 name="phone"
-                                type="text"
+                                type="tel"
                                 value={inputs.phone}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                minLength={10}
+                                maxLength={30}
+                                required
                             />
                         </label>
 
@@ -321,6 +275,10 @@ export default class CreateShop extends Component {
                                 type="text"
                                 value={inputs.ownerName}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                minLength={5}
+                                maxLength={30}
+                                required
                             />
                         </label>
                         {errors.ownerName && (
@@ -332,9 +290,12 @@ export default class CreateShop extends Component {
                             Shop owner's mobile:
                             <input
                                 name="ownerMobl"
-                                type="text"
+                                type="tel"
                                 value={inputs.ownerMobl}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                minLength={10}
+                                maxLength={30}
                             />
                         </label>
 
@@ -347,9 +308,13 @@ export default class CreateShop extends Component {
                             Counter's mobile:
                             <input
                                 name="cterMobl"
-                                type="text"
+                                type="tel"
                                 value={inputs.cterMobl}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                minLength={10}
+                                maxLength={30}
+                                required
                             />
                         </label>
 
@@ -362,9 +327,13 @@ export default class CreateShop extends Component {
                             Order mobile for web use:
                             <input
                                 name="orderMobl"
-                                type="text"
+                                type="tel"
+                                placeholder="optional"
                                 value={inputs.orderMobl}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                minLength={10}
+                                maxLength={30}
                             />
                         </label>
 
@@ -380,6 +349,10 @@ export default class CreateShop extends Component {
                                 type="time"
                                 value={inputs.weekOpen}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                // minLength={5}
+                                // maxLength={30}
+                                required
                             />
                         </label>
 
@@ -394,6 +367,10 @@ export default class CreateShop extends Component {
                                 type="time"
                                 value={inputs.weekClose}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                // minLength={5}
+                                // maxLength={30}
+                                required
                             />
                         </label>
                         {errors.weekClose && (
@@ -408,6 +385,10 @@ export default class CreateShop extends Component {
                                 type="time"
                                 value={inputs.friOpen}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                // minLength={5}
+                                // maxLength={30}
+                                required
                             />
                         </label>
 
@@ -422,6 +403,10 @@ export default class CreateShop extends Component {
                                 type="time"
                                 value={inputs.friClose}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                // minLength={5}
+                                // maxLength={30}
+                                required
                             />
                         </label>
                         {errors.friClose && (
@@ -436,6 +421,10 @@ export default class CreateShop extends Component {
                                 type="time"
                                 value={inputs.satOpen}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                // minLength={5}
+                                // maxLength={30}
+                                required
                             />
                         </label>
 
@@ -450,6 +439,10 @@ export default class CreateShop extends Component {
                                 type="time"
                                 value={inputs.satClose}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                // minLength={5}
+                                // maxLength={30}
+                                required
                             />
                         </label>
                         {errors.satClose && (
@@ -464,6 +457,10 @@ export default class CreateShop extends Component {
                                 type="time"
                                 value={inputs.sunOpen}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                // minLength={5}
+                                // maxLength={30}
+                                required
                             />
                         </label>
 
@@ -477,6 +474,10 @@ export default class CreateShop extends Component {
                                 type="time"
                                 value={inputs.sunClose}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                // minLength={5}
+                                // maxLength={30}
+                                required
                             />
                         </label>
                         {errors.sunClose && (
@@ -491,6 +492,8 @@ export default class CreateShop extends Component {
                                 type="text"
                                 value={inputs.promTxt1}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                maxLength={120}
                             />
                         </label>
 
@@ -506,6 +509,8 @@ export default class CreateShop extends Component {
                                 type="text"
                                 value={inputs.promTxt2}
                                 onChange={this.handleChange}
+                                onBlur={this.validateInput}
+                                maxLength={120}
                             />
                         </label>
 
@@ -521,6 +526,7 @@ export default class CreateShop extends Component {
                                 type="text"
                                 value={inputs.promTxt3}
                                 onChange={this.handleChange}
+                                maxLength={120}
                             />
                         </label>
 

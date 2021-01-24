@@ -223,7 +223,7 @@ class MenuShow extends Component {
             shop => shop.id == this.props.match.params.id
         );
         // const str_tbl = this.props.match.params.id;
-        console.log("stringtabhhhh" + JSON.stringify(shop1));
+        console.log("stringtabhhhh" + JSON.stringify(str_tbl));
         const { shop } = this.state;
         let str_tbl = shop.shopName + shop.area + shop.id;
         //dilivery price should be passed in controller

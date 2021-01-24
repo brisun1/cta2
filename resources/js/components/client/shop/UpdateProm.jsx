@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import axios from "axios";
+import formValidate from "../validation/formValidate";
 import {
     BrowserRouter as Router,
     Switch,
@@ -48,7 +49,8 @@ class UpdateProm extends Component {
         inputs.promTxt1 = this.props.shop.promTxt1;
         inputs.promTxt2 = this.props.shop.promTxt2;
         inputs.promTxt3 = this.props.shop.promTxt3;
-        inputs.offer = this.props.shop.offer;
+        inputs.offer = "";
+        if (this.props.shop.offer) inputs.offer = this.props.shop.offer;
         this.setState({ inputs });
     }
 
@@ -58,10 +60,24 @@ class UpdateProm extends Component {
         inputs[name] = value;
 
         this.setState({ inputs });
+        const { errors } = this.state;
+        if (errors[name]) this.validateInput();
     };
     // handleOfferChange = event => {
     //     this.setState({ offer: event.target.value });
     // };
+    validateInput = () => {
+        const { name } = event.target;
+        let errors = { ...this.state.errors };
+        if (!event.target.checkValidity()) {
+            errors[name] = event.target.validationMessage;
+            //console.log("in blur");
+            this.setState({ errors });
+        } else {
+            errors[name] = "";
+            this.setState({ errors });
+        }
+    };
     onPromChange = event => {
         this.setState({
             promPic: event.target.files[0]
@@ -80,43 +96,49 @@ class UpdateProm extends Component {
             //loaded: 0
         });
     };
+
     handleSubmit = event => {
         event.preventDefault();
+        let errors = formValidate();
+        if (errors) this.setState({ errors });
+        else {
+            //setErrors(validate());
+            //axios.post("api/clientForm", this.state).then(response => {});
+            const data = new FormData();
+            // for (var x = 0; x < this.state.selectedFile.length; x++) {
+            //     data.append("image", this.state.selectedFile[x]);
+            // }
+            // data.append("image", this.state.selectedFile);
+            if (this.state.promPic) data.append("promPic", this.state.promPic);
+            if (this.state.promPic2)
+                data.append("promPic2", this.state.promPic2);
+            if (this.state.promPic3)
+                data.append("promPic3", this.state.promPic3);
+            if (this.props.shop.id) data.append("id", this.props.shop.id);
+            const o = Object.keys(this.state.inputs);
+            for (let i = 0; i <= o.length - 1; i++) {
+                data.set(o[i], this.state.inputs[o[i]]);
+            }
+            //data["orderMobl"] = this.state.inputs.orderMobl;
+            // if (this.state.offer) {
+            //     data["offer"] = this.state.offer;
+            // }
+            //console.log("dddd" + JSON.stringify(data.promTxt2));
 
-        //setErrors(validate());
-        //axios.post("api/clientForm", this.state).then(response => {});
-        const data = new FormData();
-        // for (var x = 0; x < this.state.selectedFile.length; x++) {
-        //     data.append("image", this.state.selectedFile[x]);
-        // }
-        // data.append("image", this.state.selectedFile);
-        if (this.state.promPic) data.append("promPic", this.state.promPic);
-        if (this.state.promPic2) data.append("promPic2", this.state.promPic2);
-        if (this.state.promPic3) data.append("promPic3", this.state.promPic3);
-        if (this.props.shop.id) data.append("id", this.props.shop.id);
-        const o = Object.keys(this.state.inputs);
-        for (let i = 0; i <= o.length - 1; i++) {
-            data.set(o[i], this.state.inputs[o[i]]);
+            axios
+                .post("api/shop/minorUpdate", data, {
+                    params: {
+                        _method: "PUT"
+                    }
+                })
+
+                .then(res => {
+                    //console.log("res" + JSON.stringify(res));
+                    if (res.data == "shop minorUpdate success") {
+                        window.location.replace("/dashBoard");
+                    }
+                });
         }
-        //data["orderMobl"] = this.state.inputs.orderMobl;
-        // if (this.state.offer) {
-        //     data["offer"] = this.state.offer;
-        // }
-        //console.log("dddd" + JSON.stringify(data.promTxt2));
-
-        axios
-            .post("api/shop/minorUpdate", data, {
-                params: {
-                    _method: "PUT"
-                }
-            })
-
-            .then(res => {
-                //console.log("res" + JSON.stringify(res));
-                if (res.data == "shop minorUpdate success") {
-                    window.location.replace("/dashBoard");
-                }
-            });
     };
 
     render() {
@@ -133,6 +155,7 @@ class UpdateProm extends Component {
 
                         <form
                             id="promForm"
+                            noValidate
                             onSubmit={this.handleSubmit}
                             className="form-horizontal"
                         >
@@ -144,6 +167,9 @@ class UpdateProm extends Component {
                                         type="text"
                                         value={inputs.promTxt1}
                                         onChange={this.handleChange}
+                                        onBlur={this.validateInput}
+                                        minLength={3}
+                                        maxLength={120}
                                     />
                                 </label>
 
@@ -161,6 +187,9 @@ class UpdateProm extends Component {
                                         type="text"
                                         value={inputs.promTxt2}
                                         onChange={this.handleChange}
+                                        onBlur={this.validateInput}
+                                        minLength={3}
+                                        maxLength={120}
                                     />
                                 </label>
 
@@ -178,6 +207,9 @@ class UpdateProm extends Component {
                                         type="text"
                                         value={inputs.promTxt3}
                                         onChange={this.handleChange}
+                                        onBlur={this.validateInput}
+                                        minLength={3}
+                                        maxLength={120}
                                     />
                                 </label>
 
@@ -247,6 +279,7 @@ class UpdateProm extends Component {
                                         className="ml-2"
                                         value={inputs.offer}
                                         onChange={this.handleChange}
+                                        onBlur={this.validateInput}
                                     />
                                     <span>%</span>
                                 </label>
