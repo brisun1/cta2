@@ -31,3 +31,8 @@ Broadcast::channel('order.{id}', function (User $user, int $id) {
     // logger('Basked ID:hjhhhhhhhhh ');
     return (int) $user->id === (int) $id;
 });
+//$order_id=Order::where('id',$session('order_id'));
+// Route::post('/broadcasting/auth', function(Illuminate\Http\Request $req) {
+//     if($req->channel_name == 'presence'+$session('order_id')){return 'global';}
+//     return abort(403);
+//  });

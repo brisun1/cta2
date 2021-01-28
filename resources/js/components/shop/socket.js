@@ -2,10 +2,10 @@ import React, { useEffect, useState, useRef } from "react";
 import ReactDOM from "react-dom";
 import Echo from "laravel-echo";
 import Socketio from "socket.io-client";
-import FoodDetail2 from "./foodDetail2";
-import CustomerDetail from "./customerDetail";
+// import FoodDetail2 from "./foodDetail2";
+// import CustomerDetail from "./customerDetail";
 
-function ClientRes(props) {
+function Socket(props) {
     const ref = useRef(false);
     //const { data, setData } = useState[""];
     const [customer, setCustomer] = useState([]);
@@ -19,15 +19,14 @@ function ClientRes(props) {
         host: window.location.hostname + ":6001"
     });
 
-    //echo.private("clientRes." + props.order_id)
-    echo.channel("clientRes." + props.order_id)
+    echo.channel("clientRes.2")
         // .notification(notification => {
         //     console.log("note" + JSON.stringify(notification));
         // })
         .listen(".ResEvent", e => {
-            console.log(
-                "fff" + ref.current + "in neworder" + JSON.stringify(e.customer)
-            );
+            // console.log(
+            //     "fff" + ref.current + "in neworder" + JSON.stringify(e.customer)
+            // );
             if (ref.current === true) {
                 let custm = [...customer];
                 custm.unshift(e.customer);
@@ -116,6 +115,29 @@ function ClientRes(props) {
                 });
         }
     };
+    const sendRes = (i, orderFoodTbl) => {
+        console.log("in sen res");
+        if (clientRes[i] === false) {
+            let data = { clientRes: true };
+            axios
+                .post("api/order/clientUpdate2/" + orderFoodTbl, data, {
+                    baseURL: "/",
+                    params: {
+                        _method: "PUT"
+                    }
+                })
+
+                .then(res => {
+                    console.log("clientRes" + res.data);
+                    if (res.data == "clientRes success") {
+                        let cr = [...clientRes];
+                        cr[i] = true;
+                        setClientRes(cr);
+                        pauseAudio();
+                    }
+                });
+        }
+    };
     function playAudio() {
         //this.setState({ clicked: true });
         var x = document.getElementById("newAudio");
@@ -152,7 +174,6 @@ function ClientRes(props) {
                     </audio>
                     {playAudio()}
                 </div>
-                <div>Client res page</div>
                 {customer.map((cust, i) => {
                     if (Object.keys(cust).length > 0) {
                         // console.log("food" + food[i]);
@@ -167,8 +188,15 @@ function ClientRes(props) {
                                 }
                             >
                                 <h6 style={{ textDecoration: "underline" }}>
-                                    Cliend Res:
+                                    New order:
                                 </h6>
+                                <button
+                                    onClick={() =>
+                                        sendRes(i, cust.orderFoodTbl)
+                                    }
+                                >
+                                    send Res
+                                </button>
                                 <div>
                                     Order No.:
                                     <span className="text-success">
@@ -178,8 +206,8 @@ function ClientRes(props) {
                                         {cust.created_at.substring(11, 16)}
                                     </span>
                                 </div>
-                                {/* <FoodDetail2 foods={food[i]} />
-                                <CustomerDetail order={cust} /> */}
+                                <FoodDetail2 foods={food[i]} />
+                                <CustomerDetail order={cust} />
                             </div>
                         );
                     }
@@ -190,13 +218,13 @@ function ClientRes(props) {
         return (
             <div>
                 <br />
-                <div>Waiting for Clent Res . . . . . .</div>
+                <div>Waiting for new order . . . . . .</div>
                 <hr />
             </div>
         );
 }
 
-export default ClientRes;
+export default Socket;
 // if (document.getElementById("socket")) {
 //     ReactDOM.render(<NewOrder />, document.getElementById("socket"));
 // }

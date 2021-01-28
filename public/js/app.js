@@ -85639,7 +85639,7 @@ var App = /*#__PURE__*/function (_Component) {
   }, {
     key: "render",
     value: function render() {
-      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_2__["BrowserRouter"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_2__["Link"], {
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, "for socket"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_2__["BrowserRouter"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_2__["Link"], {
         to: "/"
       }, "Home"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_client_shop_msg__WEBPACK_IMPORTED_MODULE_5__["default"], null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_2__["Switch"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_2__["Route"], {
         exact: true,
@@ -93108,6 +93108,25 @@ var ExistMenu = /*#__PURE__*/function (_Component) {
       _this.props.closeModal(event);
     });
 
+    _defineProperty(_assertThisInitialized(_this), "sendRes", function () {
+      console.log("in sen res"); //if (clientRes[i] === false) {
+      // let data = { clientRes: true };
+
+      axios.post("api/order/test/2", 3, {
+        baseURL: "/" // params: {
+        //     _method: "PUT"
+        // }
+
+      }).then(function (res) {
+        console.log("clientRes" + res.data); // if (res.data == "clientRes success") {
+        //     let cr = [...clientRes];
+        //     cr[i] = true;
+        //     setClientRes(cr);
+        //     pauseAudio();
+        // }
+      }); //}
+    });
+
     _this.state = {
       //shop: this.props.shop,
       menu: _this.props.menu,
@@ -93120,9 +93139,6 @@ var ExistMenu = /*#__PURE__*/function (_Component) {
 
   _createClass(ExistMenu, [{
     key: "render",
-    // toggleScrollLock = () => {
-    //     document.querySelector("html").classList.toggle("scroll-lock");
-    // };
     value: function render() {
       var _this2 = this;
 
@@ -93167,7 +93183,11 @@ var ExistMenu = /*#__PURE__*/function (_Component) {
         }
       })) : null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h5", {
         className: "text-center"
-      }, "Menu"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("form", {
+      }, "Menu"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        onClick: function onClick() {
+          return _this2.sendRes();
+        }
+      }, "send Res"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("form", {
         onSubmit: this.props.handleSubmitFoodForm
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("table", {
         className: "table table-bordered",
@@ -95821,14 +95841,14 @@ function ClientRes(props) {
   var echo = new laravel_echo__WEBPACK_IMPORTED_MODULE_2__["default"]({
     broadcaster: "socket.io",
     host: window.location.hostname + ":6001"
-  });
-  echo["private"]("order." + props.order_id) // .notification(notification => {
+  }); //echo.private("clientRes." + props.order_id)
+
+  echo.channel("clientRes." + props.order_id) // .notification(notification => {
   //     console.log("note" + JSON.stringify(notification));
   // })
   .listen(".ResEvent", function (e) {
-    // console.log(
-    //     "fff" + ref.current + "in neworder" + JSON.stringify(e.customer)
-    // );
+    console.log("fff" + ref.current + "in neworder" + JSON.stringify(e.customer));
+
     if (ref.current === true) {
       var custm = _toConsumableArray(customer);
 

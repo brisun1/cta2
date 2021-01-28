@@ -29,6 +29,7 @@ class App extends Component {
     render() {
         return (
             <>
+                <div>for socket</div>
                 <Router>
                     <Link to="/">Home</Link>
                     <Msg />

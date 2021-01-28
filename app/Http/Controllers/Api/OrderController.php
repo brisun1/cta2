@@ -11,7 +11,7 @@ use App\User;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
-
+use Illuminate\Support\Facades\Notification;
 use App\Order;
 use App\OrderMenu;
 use App\CreateTbl;
@@ -218,13 +218,14 @@ class OrderController extends Controller
           // { event(new \App\Events\SendMessage($order,$food));
             $order->isComplete=true;
             $order->save();
+            session(['order_id'=>$order->id]);
             { event(new \App\Events\NewOrder($order,$food,$user_id));
            
             $user=User::where("id",$user_id)->first();
             $user->notify(new NewOrderNote($order->id));
             
             //$this->sendSMS($order->order_mobl);
-           
+            session(['order_id' => $order->id]);
                 return "pwd matched";}
         }else return "wrong password";
     }
@@ -440,23 +441,41 @@ class OrderController extends Controller
     
         $order->save();
        return "clientRes success";}
-       public function clientUpdate2(Request $request, $tblName)
+       public function test(Request $request, $tblName)
        {
            $order= Order::where('orderFoodTbl',$tblName)->first();
        
-       if($request->has("clientRes")){
+    //    if($request->has("clientRes")){
    
-           $order->clientRes=$request->clientRes;
-       }
+    //        $order->clientRes=$request->clientRes;
+    //    }
        
-           $order->save();
-           $order_id=$order->id;
-            event(new \App\Events\ClientRes($order_id));
-           $user=$session($order_id);
+        //    $order->save();
+        //    $order_id=$order->id;
+            //event(new \App\Events\ClientRes($order_id));
+            event(new \App\Events\ClientRes(2));
+           //$user=$session('order_id');
             //$user=User::where("id",$user_id)->first();
-            $user->notify(new ClientResNote($order_id));
-          return "clientRes2 success";}
-    public function destroy($id)
+            //$user->notify(new ClientResNote(2));
+            //Notification::send($users, new ClientResNote(2));
+          return "test success";}
+          public function clientUpdate2(Request $request, $tblName)
+          {
+              $order= Order::where('orderFoodTbl',$tblName)->first();
+          
+          if($request->has("clientRes")){
+      
+              $order->clientRes=$request->clientRes;
+          }
+          
+              $order->save();
+              $order_id=$order->id;
+               event(new \App\Events\ClientRes($order_id));
+              $user=$session('order_id');
+               //$user=User::where("id",$user_id)->first();
+               $user->notify(new ClientResNote($order_id));
+             return "clientRes2 success";}
+          public function destroy($id)
     {
         //
     }

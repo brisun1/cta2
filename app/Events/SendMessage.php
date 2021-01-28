@@ -22,14 +22,14 @@ class SendMessage implements ShouldBroadcast
      * @return void
      */
    // public $data=['asas'];
-    public $order;
-    public $food;
+    // public $order;
+    // public $food;
     //public $order;
-    public function __construct($order, $food)
-    {
-         $this->order=$order;
-         $this->food=$food;
-    }
+    // public function __construct($order, $food)
+    // {
+    //      $this->order=$order;
+    //      $this->food=$food;
+    // }
 
     /**
      * Get the channels the event should broadcast on.
@@ -40,10 +40,10 @@ class SendMessage implements ShouldBroadcast
     // {
     //     return new PrivateChannel('channel-name');
     // }
-    // public function broadcastOn()
-    // {
-    //     return new Channel('user-channel');
-    // }
+    public function broadcastOn()
+    {
+        return new Channel('user-channel');
+    }
 
     /**
      * The event's broadcast name.
@@ -59,17 +59,17 @@ class SendMessage implements ShouldBroadcast
      *
      * @return string
      */
-    public function broadcastWith()
-    {
-        $a=$this->food;
-        $i=0;
-        $fname=[];
-        foreach($this->food as $fooda){
-$fname[$i]=$fooda->fname;
-        }
-        // fid,fname main_attach,qty,price
-        //return ['customer'=>$this->order,'food'=>$this->food];
-        return ['food'=>$this->food,'customer'=>$this->order];
-    }
+    // public function broadcastWith()
+    // {
+    //     $a=$this->food;
+    //     $i=0;
+    //     $fname=[];
+    //     foreach($this->food as $fooda){
+    //     $fname[$i]=$fooda->fname;
+    //     }
+    //     // fid,fname main_attach,qty,price
+    //     //return ['customer'=>$this->order,'food'=>$this->food];
+    //     return ['food'=>$this->food,'customer'=>$this->order];
+    // }
 
 }

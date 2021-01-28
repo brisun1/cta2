@@ -26,7 +26,7 @@ class ClientRes
     {
         //$this->order=$order;
          
-         $this->order_id=$order_id;
+        // $this->order_id=$order_id;
     }
 
     /**
@@ -36,8 +36,11 @@ class ClientRes
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('order.'.$this->order_id);
+        //return new PrivateChannel('order.'.$this->order_id);
         //return new PrivateChannel('channel-name');
+        //return new Channel('clientRes.'.$this->order_id);
+        return new Channel('clientRes.2');
+        //return new PresenceChannel('presence.'.$this->order_id);
     }
     public function broadcastAs()
     {

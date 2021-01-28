@@ -26,6 +26,10 @@ Route::get('/t', function () {
     event(new \App\Events\SendMessage());
     dd('Event Run Successfully.');
 });
+Route::get('/tt', function () {
+    event(new \App\Events\ClientRes());
+    dd('Event Run Successfully.');
+});
 Route::get('/w', function () {
     return view('welcome');
 });
